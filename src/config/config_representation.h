@@ -9,10 +9,8 @@
 #include <iterator>
 #include <iostream>
 #include <openssl/crypto.h>
-
-#include "config_representation.h"
 #include "log/log.h"
-
+#include "filesystem/vault_handling.h"
 
 enum class FileObfuscation;
 enum class EncryptionMode;
@@ -91,6 +89,12 @@ struct ConfigRepresentation {
 
     explicit ConfigRepresentation() {
         vault_file_path = std::move(get_home_directory());
+
+        if (!std::filesystem::exists(vault_file_path)) {
+            logger.log(DEBUG, "create_vault()", "Creating vault in users home directory...");
+            create_vault(vault_file_path);
+        }
+
         decrypt = false;
         encryption_mode = EncryptionMode::AES_256_GCM;
     }

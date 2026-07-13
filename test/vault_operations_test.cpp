@@ -277,9 +277,9 @@ BOOST_AUTO_TEST_CASE(check_home_directory) {
         FLAG_DEFCON_LEVEL_TO_ENCRYPT,
         "5",
     };
-    create_vault(config_representation.vault_file_path);
 
     BOOST_CHECK(!config_representation.vault_file_path.empty());
+    BOOST_CHECK(std::filesystem::exists(config_representation.vault_file_path));
     std::filesystem::remove(config_representation.vault_file_path);
     //if tests fail it can leave the dead files there so we must do this
 

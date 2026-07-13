@@ -2,10 +2,15 @@
 // Created by dustyn on 6/16/26.
 //
 
-#include "vault_handling.h"
+#include <fstream>
 
+#include <iostream>
+#include "config/config_representation.h"
+#include "vault_handling.h"
+#include <string>
 #include <algorithm>
 #include <cstring>
+
 
 std::string get_defcon_signature(std::string &vault_file_path, Defcon defcon) {
     std::ifstream vault(vault_file_path);

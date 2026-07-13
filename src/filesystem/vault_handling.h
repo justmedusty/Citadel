@@ -4,17 +4,15 @@
 
 #ifndef CITADEL_VAULT_HANDLING_H
 #define CITADEL_VAULT_HANDLING_H
-#include <string>
-#include "config/config_representation.h"
-#include <sstream>
 
-#include <fstream>
-
-#include <iostream>
+#include <filesystem>
 
 #define MAXIMUM_VAULT_SIZE (1024 * 1024 * 1024) // This is arbitrary but because we are reading the entire file into memory we need a sanity check, 1MB is absolutely massive so this should never happen
 
 
+
+enum class Defcon;
+struct ConfigRepresentation;
 
 bool is_vault_setup(std::filesystem::path &vault_file_path);
 
