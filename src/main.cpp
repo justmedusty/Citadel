@@ -13,6 +13,7 @@ int main(int argc, char **argv) {
     const std::vector<std::string> arguments(argv + 1, argv + argc);
     auto config = new ConfigRepresentation();
     config->parse_command_line_args(arguments);
+    Encryption::EncryptionContext encryption_context(*config);
 
     return 0;
 }
