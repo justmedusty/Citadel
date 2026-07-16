@@ -11,10 +11,16 @@
 
 
 
+#define DEFCON1_SIG_PRESENT (1 << 0)
+#define DEFCON2_SIG_PRESENT (1 << 1)
+#define DEFCON3_SIG_PRESENT (1 << 2)
+#define DEFCON4_SIG_PRESENT (1 << 3)
+#define DEFCON5_SIG_PRESENT (1 << 4)
+
 enum class Defcon;
 struct ConfigRepresentation;
 
-bool is_vault_setup(std::filesystem::path &vault_file_path);
+int8_t is_vault_setup(std::filesystem::path &vault_file_path);
 
 void write_entry(std::string &key, std::string &value, ConfigRepresentation &config);
 

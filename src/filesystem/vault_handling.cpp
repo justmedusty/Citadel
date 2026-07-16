@@ -53,7 +53,8 @@ std::string get_defcon_signature(std::string &vault_file_path, Defcon defcon) {
     return "";
 }
 
-bool is_vault_setup(std::filesystem::path &vault_file_path) {
+int8_t is_vault_setup(std::filesystem::path &vault_file_path) {
+    int8_t bitmap = 0;
     std::ifstream vault(vault_file_path);
     if (!vault.is_open()) {
         std::cerr << "Could not open vault file : " << vault_file_path << std::endl;
@@ -92,10 +93,9 @@ bool is_vault_setup(std::filesystem::path &vault_file_path) {
             }
         }
 
+        //This could cause a bug if there was somehow a sig without a defcon header but that is not possible from application vault setup only manual vault f
         if (line.starts_with(CITADEL_VAULT_SIG_START)) {
-            /*
-             *  We won't check that the whole signature is there , it will be unless someone is playing around with their own vault file
-             */
+            bitmap |= (1 << (found - 1));
             sig++;
         }
     }
@@ -104,15 +104,16 @@ bool is_vault_setup(std::filesystem::path &vault_file_path) {
         std::cerr << vault_file_path <<
                 " contains a vault file, but it is invalid! You will need to fix it or reset your vault!" <<
                 std::endl;
-        return false;
+        return -1;
     }
 
     if (found > 0 || sig > 0) {
-        logger.log(WARN, "is_vault_setup()",
+        logger.log(INFO, "is_vault_setup()",
                    "Not all defcon levels have an associated verification signature. This will not prevent this program from running, but you will need to set a password for any DEFCON section without an associated signature."
         );
     }
-    return true;
+    std::cout << bitmap << std::endl;
+    return bitmap;
 }
 
 void write_entry(std::string &key, std::string &value, ConfigRepresentation &config) {

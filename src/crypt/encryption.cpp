@@ -311,7 +311,6 @@ namespace Encryption {
 
 
     void EncryptionContext::receive_passphrase() {
-        return;
         if (!stdin_terminal()) {
             return;
             // This is for testing purposes for now but may be good from preventing the wrong use of this application
@@ -330,7 +329,6 @@ namespace Encryption {
 
 
     void EncryptionContext::receive_confirm_passphrase() {
-        return;
         if (!stdin_terminal()) {
             return;
             // This is for testing purposes for now but may be good from preventing the wrong use of this application
@@ -338,7 +336,7 @@ namespace Encryption {
         set_stdin_echo(false);
         std::string current_DEFCON;
 
-        std::cout << "Please enter your password, the DEFCON level password you must provide is DEFCON" << static_cast<
+        std::cout << "Please confirm your password, the DEFCON level password you must provide is DEFCON" << static_cast<
                     int>(this->current_defcon) <<
                 std::endl;
 

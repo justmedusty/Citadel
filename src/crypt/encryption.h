@@ -52,7 +52,6 @@ namespace Encryption {
             this->mode = EncryptionMode::AES_256_GCM; //Default algo
             this->secret = config.value;
             this->defcon_signature = "";
-            receive_passphrase();
         }
 
         ~EncryptionContext() {
