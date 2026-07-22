@@ -157,10 +157,15 @@ namespace Encryption {
         return "";
     }
 
-    bool EncryptionContext::verify_defcon_signature() {
+    bool EncryptionContext::verify_defcon_signature(std::optional<std::string> signature) {
         std::string expected = CITADEL_ENCRYPTION_STRING;
-        std::string signature = this->get_signature();
-        std::string decoded_signature = Base64::base64_decode(signature);
+        std::string sig;
+        if (signature.has_value()) {
+            sig = signature.value();
+        } else {
+            sig = this->get_signature();
+        }
+        std::string decoded_signature = Base64::base64_decode(sig);
         std::string salt = decoded_signature.substr(0,KDF_SALT_SIZE_BYTES);
         std::string iv = decoded_signature.substr(KDF_SALT_SIZE_BYTES, AES_GCM_IV_LEN);
         std::string tag = decoded_signature.substr(KDF_SALT_SIZE_BYTES + AES_GCM_IV_LEN, AES_GCM_AEAD_TAG_SIZE);
@@ -336,7 +341,8 @@ namespace Encryption {
         set_stdin_echo(false);
         std::string current_DEFCON;
 
-        std::cout << "Please confirm your password, the DEFCON level password you must provide is DEFCON" << static_cast<
+        std::cout << "Please confirm your password, the DEFCON level password you must provide is DEFCON" << static_cast
+                <
                     int>(this->current_defcon) <<
                 std::endl;
 

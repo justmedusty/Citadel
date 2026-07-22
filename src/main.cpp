@@ -1,7 +1,7 @@
 #include <iostream>
 #include <config/config_representation.h>
 #include "crypt/encryption.h"
-
+#include <optional>
 int main(int argc, char **argv) {
 #if defined(_WIN32)
     std::cout <<
@@ -20,8 +20,16 @@ int main(int argc, char **argv) {
         std::string sig = encryption_context.generate_signature();
         write_signature(sig,encryption_context.current_defcon,*config);
     }
-
     encryption_context.receive_passphrase();
+
+    if (config->decrypt) {
+        std::optional<std::string> signature; // this is just an optional for verify defcon sig below
+        read_entry(config->key,encryption_context.secret,*config,&signature.value());
+        encryption_context.verify_defcon_signature(signature);
+    }else {
+        encryption_context.verify_defcon_signature({});
+        write_entry(config->key,encryption_context.secret,*config);
+    }
 
 
 

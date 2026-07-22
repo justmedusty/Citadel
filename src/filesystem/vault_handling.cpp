@@ -93,7 +93,7 @@ int8_t is_vault_setup(std::filesystem::path &vault_file_path) {
             }
         }
 
-        //This could cause a bug if there was somehow a sig without a defcon header but that is not possible from application vault setup only manual vault f
+        //This could cause a bug if there was somehow a sig without a defcon header but that is not possible from application vault setup only manual vault fuckery
         if (line.starts_with(CITADEL_VAULT_SIG_START)) {
             bitmap |= (1 << (found - 1));
             sig++;

@@ -193,7 +193,7 @@ BOOST_AUTO_TEST_CASE(write_signature_test) {
     std::cout << sig << std::endl;
     write_signature(sig, encryption_context.current_defcon, config_representation);
     std::cout << "wrote sig" << std::endl;
-    BOOST_CHECK(encryption_context.verify_defcon_signature());
+    BOOST_CHECK(encryption_context.verify_defcon_signature(sig));
 
     std::filesystem::remove(vault_file_path);
 }
