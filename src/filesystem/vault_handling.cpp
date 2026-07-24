@@ -235,6 +235,96 @@ void write_signature(std::string &signature, Defcon defcon, ConfigRepresentation
 /*
  *  Finds an entry and reads it into value.
  */
+
+std::vector<std::string> read_many_entries(std::vector<std::string> keys, ConfigRepresentation &config,
+                                           std::string *signature) {
+    std::ifstream vault(config.vault_file_path);
+
+    if (!vault.is_open()) {
+        std::cerr << "Could not open fault file : " << config.vault_file_path << std::endl;
+        exit(1);
+    }
+
+    if (std::filesystem::file_size(config.vault_file_path) > MAXIMUM_VAULT_SIZE) {
+        std::cerr << std::filesystem::file_size(config.vault_file_path) <<
+                " is too large for Citadel to handle. Please investigate." << std::endl;
+        exit(1);
+    }
+    std::vector<std::string> values;
+    std::string line;
+    std::string sig;
+    Defcon defcon;
+    int num_found = 0;\
+    bool found = false;
+
+    for (auto key: keys) {
+        while (std::getline(vault, line)) {
+            if (line == CITADEL_DEFCON_1) {
+                if (found == true) {
+                    return std::move(values);
+                }
+                defcon = Defcon::DEFCON1;
+                continue;
+            }
+
+            if (line == CITADEL_DEFCON_2) {
+                if (found == true) {
+                    return std::move(values);
+                }
+                defcon = Defcon::DEFCON2;
+                continue;
+            }
+
+            if (line == CITADEL_DEFCON_3) {
+                if (found == true) {
+                    return std::move(values);
+                }
+                defcon = Defcon::DEFCON3;
+                continue;
+            }
+            if (line == CITADEL_DEFCON_4) {
+                if (found == true) {
+                    return std::move(values);
+                }
+                defcon = Defcon::DEFCON4;
+                continue;
+            }
+            if (line == CITADEL_DEFCON_5) {
+                if (found == true) {
+                    return std::move(values);
+                }
+                defcon = Defcon::DEFCON5;
+                continue;
+            }
+
+            if (line.starts_with(CITADEL_VAULT_SIG_START)) {
+                logger.log(DEBUG, "read_entry()",
+                           std::format("Signature for Defcon{} is {}", static_cast<int>(defcon), *line.c_str()));
+                sig = line.replace(line.find(CITADEL_VAULT_SIG_START), strlen(CITADEL_VAULT_SIG_START) - 1, "").replace(
+                    line.find(CITADEL_VAULT_SIG_END), strlen(CITADEL_VAULT_SIG_END) - 1, "");
+            }
+
+            if (line.starts_with('#')) // support comments
+                continue;
+
+            std::string k = line.substr(0, line.find('='));
+            std::string v = line.substr(line.find('=') + 1, line.size() - line.find('=') - 1);
+
+
+            std::cout << k << ":" << v << std::endl;
+
+            if (k == key) {
+                found = true;
+                values.push_back(v);
+                *signature = std::move(sig);
+            }
+        }
+
+        std::cerr << "The key " << key << " is not present in the vault file." << std::endl;
+        exit(1);
+    }
+}
+
 Defcon read_entry(std::string &key, std::string &value, ConfigRepresentation &config, std::string *signature) {
     std::ifstream vault(config.vault_file_path);
 
