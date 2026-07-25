@@ -255,9 +255,10 @@ std::vector<std::string> read_many_entries(std::vector<std::string> keys, Config
     std::string sig;
     Defcon defcon;
     int num_found = 0;\
+    //found is used so that we dont jump to another defcon when weve grabbed keys from a different one. Read many is ONLY for entries in the same defcon level.
     bool found = false;
 
-    for (auto key: keys) {
+    for (const auto &key: keys) {
         while (std::getline(vault, line)) {
             if (line == CITADEL_DEFCON_1) {
                 if (found == true) {
@@ -311,13 +312,18 @@ std::vector<std::string> read_many_entries(std::vector<std::string> keys, Config
             std::string v = line.substr(line.find('=') + 1, line.size() - line.find('=') - 1);
 
 
-            std::cout << k << ":" << v << std::endl;
+            logger.log(DEBUG, "read_many_entries()", k);
+            logger.log(DEBUG, "read_many_entries()", v);
 
             if (k == key) {
                 found = true;
                 values.push_back(v);
                 *signature = std::move(sig);
             }
+        }
+
+        if (found == true) {
+            return std::move(values);
         }
 
         std::cerr << "The key " << key << " is not present in the vault file." << std::endl;
