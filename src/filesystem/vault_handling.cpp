@@ -236,7 +236,7 @@ void write_signature(std::string &signature, Defcon defcon, ConfigRepresentation
  *  Finds an entry and reads it into value.
  */
 
-std::vector<std::string> read_many_entries(std::vector<std::string> keys, ConfigRepresentation &config,
+std::vector<std::string> read_many_entries(std::vector<std::string> &keys, ConfigRepresentation &config,
                                            std::string *signature) {
     std::ifstream vault(config.vault_file_path);
 
@@ -254,7 +254,6 @@ std::vector<std::string> read_many_entries(std::vector<std::string> keys, Config
     std::string line;
     std::string sig;
     Defcon defcon;
-    int num_found = 0;\
     //found is used so that we dont jump to another defcon when weve grabbed keys from a different one. Read many is ONLY for entries in the same defcon level.
     bool found = false;
 
@@ -397,6 +396,61 @@ Defcon read_entry(std::string &key, std::string &value, ConfigRepresentation &co
     }
 
     std::cerr << "The key " << key << " is not present in the vault file." << std::endl;
+    exit(1);
+}
+
+
+void list_all_entries(const ConfigRepresentation &config) {
+    std::ifstream vault(config.vault_file_path);
+
+    if (!vault.is_open()) {
+        std::cerr << "Could not open fault file : " << config.vault_file_path << std::endl;
+        exit(1);
+    }
+
+    if (std::filesystem::file_size(config.vault_file_path) > MAXIMUM_VAULT_SIZE) {
+        std::cerr << std::filesystem::file_size(config.vault_file_path) <<
+                " is too large for Citadel to handle. Please investigate." << std::endl;
+        exit(1);
+    }
+
+    std::string line;
+
+    while (std::getline(vault, line)) {
+        if (line == CITADEL_DEFCON_1) {
+            std::cout << CITADEL_DEFCON_1 << std::endl;
+            continue;
+        }
+
+        if (line == CITADEL_DEFCON_2) {
+            std::cout << CITADEL_DEFCON_1 << std::endl;
+            continue;
+        }
+
+        if (line == CITADEL_DEFCON_3) {
+            std::cout << CITADEL_DEFCON_1 << std::endl;
+            continue;
+        }
+        if (line == CITADEL_DEFCON_4) {
+            std::cout << CITADEL_DEFCON_1 << std::endl;
+            continue;
+        }
+        if (line == CITADEL_DEFCON_5) {
+            std::cout << CITADEL_DEFCON_1 << std::endl;
+            continue;
+        }
+
+        if (line.starts_with(CITADEL_VAULT_SIG_START)) {
+            std::cout << "Signature found! This Defcon Level is fully set up." << std::endl;
+        }
+
+        if (line.starts_with('#')) // support comments
+            continue;
+
+        std::string k = line.substr(0, line.find('='));
+        std::cout << k << std::endl;
+    }
+
     exit(1);
 }
 

@@ -49,9 +49,16 @@ std::filesystem::path ConfigRepresentation::get_home_directory() {
 
 
 void ConfigRepresentation::parse_command_line_args(std::vector<std::string> arguments) {
+    bool ls = false;
     for (auto arg = arguments.begin(); arg != arguments.end(); ++arg) {
         if (*arg == FLAG_HELP) {
             help();
+        }
+
+        if (*arg == FLAG_LIST_ALL_KEYS) {
+            //we do not list it right away since they may pass us a different vault file via a commandline option instead of the default vault file, we do it
+            //after parsing
+            ls = true;
         }
         if ((*arg) == FLAG_ENCRYPT) {
             this->decrypt = false;
@@ -139,6 +146,22 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
         }
     }
 
+
+    if (!this->vault_file_path.empty() && !std::filesystem::exists(this->vault_file_path)) {
+        std::cerr << "You have specified a vault file and the file does not exist! See : " << this->vault_file_path
+                << "Try citadel -h for help!" <<
+                std::endl;
+        if (!this->value.empty()) {
+            //cleanse that shit
+            OPENSSL_cleanse(this->value.data(), this->value.size());
+        }
+        exit(1);
+    }
+
+    if (ls) {
+        list_all_entries(*this);
+    }
+
     if (this->key.empty()) {
         std::cerr << "You have not specified a key! You must provide a key! Try citadel -h for help!" << std::endl;
         exit(1);
@@ -153,17 +176,6 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
                 "You have no specified a value and are trying to encrypt! You must provide a value! Try citadel -h for help!"
                 <<
                 std::endl;
-        exit(1);
-    }
-
-    if (!this->vault_file_path.empty() && !std::filesystem::exists(this->vault_file_path)) {
-        std::cerr << "You have specified a vault file and the file does not exist! See : " << this->vault_file_path
-                << "Try citadel -h for help!" <<
-                std::endl;
-        if (!this->value.empty()) {
-            //cleanse that shit
-            OPENSSL_cleanse(this->value.data(), this->value.size());
-        }
         exit(1);
     }
 }

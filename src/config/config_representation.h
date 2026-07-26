@@ -28,7 +28,7 @@ enum class EncryptionMode;
 #define FLAG_VALUE "-v"
 #define FLAG_VAULT_FILE_LOCATION "-vf"
 #define FLAG_DEFCON_LEVEL_TO_ENCRYPT "-defcon"
-#define FLAG_LIST_ALL_KEYS "-list"
+#define FLAG_LIST_ALL_KEYS "-ls"
 
 
 #define FILE_NO_OBFUSCATION_CONFIG_KEY "no_obfuscation"
@@ -112,7 +112,7 @@ struct ConfigRepresentation {
     Defcon defcon;
 
 private:
-    std::filesystem::path get_home_directory();
+    static std::filesystem::path get_home_directory();
 
     static void help() {
         std::cout <<
@@ -130,9 +130,8 @@ private:
                 "-a -> precedes the encryption algorithm you wish to use. Not yet implemented." << std::endl <<
                 "-h -> display the help message you are currently reading." << std::endl <<
                 "-dk -> delete a key and its associated value from the vault" << std::endl <<
-                "-defcon -> precedes an integer (1,2,3,4,5) for an ENCRYPT operation only, specifies where the new entry should go"
-                <<
-                "-list -> lists all entries in your vault" << std::endl
+                "-defcon -> precedes an integer (1,2,3,4,5) for an ENCRYPT operation only, specifies where the new entry should go" << std::endl <<
+                "-ls -> lists all entries in your vault" << std::endl
                 << std::endl <<
                 "-repass -> precedes a DEFCON option, DEFCON1 for defcon 1 and so on. Changes the password for that entire section of the vault. You must verify the current password first."
                 << std::endl <<

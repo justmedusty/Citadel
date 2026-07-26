@@ -34,6 +34,7 @@ std::string get_defcon_signature(std::string &vault_file_path, Defcon defcon);
 
 void create_vault(std::filesystem::path &vault_path);
 
-std::vector<std::string> read_many_entries(std::vector<std::string> keys, ConfigRepresentation &config,
+std::vector<std::string> read_many_entries(std::vector<std::string>& keys, ConfigRepresentation &config,
                                            std::string *signature);
+void list_all_entries(const ConfigRepresentation &config);
 #endif //CITADEL_VAULT_HANDLING_H
