@@ -159,12 +159,7 @@ namespace Encryption {
 
     bool EncryptionContext::verify_defcon_signature(std::optional<std::string> signature) {
         std::string expected = CITADEL_ENCRYPTION_STRING;
-        std::string sig;
-        if (signature.has_value()) {
-            sig = signature.value();
-        } else {
-            sig = this->get_signature();
-        }
+        std::string sig = this->get_signature();
         std::string decoded_signature = Base64::base64_decode(sig);
         std::string salt = decoded_signature.substr(0,KDF_SALT_SIZE_BYTES);
         std::string iv = decoded_signature.substr(KDF_SALT_SIZE_BYTES, AES_GCM_IV_LEN);
@@ -188,6 +183,7 @@ namespace Encryption {
 
         this->secret.resize(cipherttxt.length());
 
+        //This can be hardcoded to 50 because the sig string is hardcoded and known in advance
         std::string plaintext(50, '\0');
         //giving extra just in case, we will just check the expected size from 0 offset
 
@@ -253,12 +249,19 @@ namespace Encryption {
         auto ret = aes_256_gcm_decrypt(ciphertext_ptr, cipherttxt.size(), key_ptr, iv_ptr, plaintext_ptr, plaintext_len,
                                        tag_ptr);
         logger.log(DEBUG, "decrypt_string()", "Returned from aes_256_gcm_decrypt...");
+
         if (!ret) {
             std::cerr << "Decryption failed" << std::endl;
+            exit(1);
         }
+
+
     }
 
     std::string EncryptionContext::generate_signature() {
+        std::cout <<
+                "You must set the password for this section of the vault, please type your password, and then confirm it. This will be checked against for any new entries you write in this vault section to ensure consistency"
+                << std::endl;
         receive_passphrase();
         receive_confirm_passphrase();
 

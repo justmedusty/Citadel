@@ -24,16 +24,18 @@ int main(int argc, char **argv) {
     encryption_context.receive_passphrase();
 
     if (config->decrypt) {
-        std::optional<std::string> signature; // this is just an optional for verify defcon sig below
-        read_entry(config->key, encryption_context.secret, *config, &signature.value());
+        std::string signature(100,'\0'); // this is just an optional for verify defcon sig below
+        std::string entry(100, '\0');;
+        auto def = read_entry(config->key, entry, *config, &signature);
         encryption_context.verify_defcon_signature(signature);
+        encryption_context.decrypt_string(entry);
+        std::cout << encryption_context.secret << std::endl;
     } else {
         encryption_context.verify_defcon_signature({});
         encryption_context.secret = std::move(config->value);
         auto encrypted_secret = encryption_context.encrypt_string();
         write_entry(config->key, encrypted_secret, *config);
     }
-
 
     return 0;
 }

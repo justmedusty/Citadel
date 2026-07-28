@@ -401,7 +401,7 @@ BOOST_AUTO_TEST_CASE(write_vault_test_different_levels) {
 
     std::filesystem::remove(vault_file_path);
 }
-
+/* This test is too destructive for use on a machine that you use this software on so it goes into the dungeon for now
 BOOST_AUTO_TEST_CASE(check_home_directory) {
     ConfigRepresentation config_representation{};
     const std::vector<std::string> args = {
@@ -422,3 +422,4 @@ BOOST_AUTO_TEST_CASE(check_home_directory) {
 
     std::filesystem::remove(config_representation.vault_file_path);
 }
+*/

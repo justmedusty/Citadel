@@ -50,6 +50,8 @@ std::filesystem::path ConfigRepresentation::get_home_directory() {
 
 void ConfigRepresentation::parse_command_line_args(std::vector<std::string> arguments) {
     bool ls = false;
+    //Set a default value if the user does not specify it will go to defcon5
+    this->defcon = Defcon::DEFCON5;
     for (auto arg = arguments.begin(); arg != arguments.end(); ++arg) {
         if (*arg == FLAG_HELP) {
             help();
@@ -60,6 +62,7 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
             //after parsing
             ls = true;
         }
+
         if ((*arg) == FLAG_ENCRYPT) {
             this->decrypt = false;
             continue;
