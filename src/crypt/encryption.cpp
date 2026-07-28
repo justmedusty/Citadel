@@ -214,6 +214,7 @@ namespace Encryption {
             return false;
         }
 
+        this->secret.clear();
         return true;
     }
 
