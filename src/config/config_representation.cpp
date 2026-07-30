@@ -85,7 +85,7 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
              *  The way we are parsing this is forgiving , 12434534 would be 1 , 23453456, would be 2 etc.
              */
 
-            switch (char level = arg->data()[0]) {
+            switch (arg->data()[0]) {
                 case '1':
                     this->defcon = Defcon::DEFCON1;
                     break;
@@ -108,6 +108,7 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
                      */
                     exit(1);
             }
+            continue;
         }
 
         if (*arg == FLAG_VALUE) {

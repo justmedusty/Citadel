@@ -138,7 +138,30 @@ void write_entry(std::string &key, std::string &value, ConfigRepresentation &con
     }
 
     std::string line;
+
+    auto current_defcon = config.defcon;
+
+    auto target_string = CITADEL_DEFCON_1;
+
+    switch (current_defcon) {
+        case Defcon::DEFCON1:
+            target_string = CITADEL_DEFCON_1;
+            break;
+        case Defcon::DEFCON2:
+            target_string = CITADEL_DEFCON_2;
+            break;
+        case Defcon::DEFCON3:
+            target_string = CITADEL_DEFCON_3;
+            break;
+        case Defcon::DEFCON4:
+            target_string = CITADEL_DEFCON_4;
+            break;
+        case Defcon::DEFCON5:
+            target_string = CITADEL_DEFCON_5;
+            break;
+    }
     bool found = false;
+    bool done = false;
 
     while (std::getline(vault, line)) {
         std::string k = line.substr(0, line.find('='));
@@ -146,10 +169,24 @@ void write_entry(std::string &key, std::string &value, ConfigRepresentation &con
             std::cerr << k << " clashes with your new key : " << key << ". Aborting." << std::endl;
             exit(1);
         }
+
+        if (done) {
+            temp << line << std::endl;
+            continue;
+        }
+
+        if (line == target_string) {
+            found = true;
+        }
+        if (found && line.starts_with(CITADEL_VAULT_SIG_START)) {
+            temp << line << std::endl;
+            temp << key << '=' << value << std::endl;
+            done = true;
+            continue;
+        }
         temp << line << std::endl;
     }
 
-    temp << key << '=' << value << std::endl;
 
     vault.close();
     temp.close();
@@ -180,6 +217,7 @@ void write_signature(std::string &signature, Defcon defcon, ConfigRepresentation
     }
 
     std::ifstream vault(config.vault_file_path);
+
     if (!vault.is_open()) {
         std::cerr << "Could not open vault file: " << config.vault_file_path << std::endl;
         exit(1);
