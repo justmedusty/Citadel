@@ -427,7 +427,7 @@ Defcon read_entry(std::string &key, std::string &value, ConfigRepresentation &co
         std::cout << k << ":" << v << std::endl;
 
         if (k == key) {
-            value = v;
+            value = std::move(v);
             *signature = std::move(sig);
             return defcon;
         }
