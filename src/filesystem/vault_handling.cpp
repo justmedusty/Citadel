@@ -461,25 +461,26 @@ void list_all_entries(const ConfigRepresentation &config) {
         }
 
         if (line == CITADEL_DEFCON_2) {
-            std::cout << CITADEL_DEFCON_1 << std::endl;
+            std::cout << CITADEL_DEFCON_2 << std::endl;
             continue;
         }
 
         if (line == CITADEL_DEFCON_3) {
-            std::cout << CITADEL_DEFCON_1 << std::endl;
+            std::cout << CITADEL_DEFCON_3 << std::endl;
             continue;
         }
         if (line == CITADEL_DEFCON_4) {
-            std::cout << CITADEL_DEFCON_1 << std::endl;
+            std::cout << CITADEL_DEFCON_4 << std::endl;
             continue;
         }
         if (line == CITADEL_DEFCON_5) {
-            std::cout << CITADEL_DEFCON_1 << std::endl;
+            std::cout << CITADEL_DEFCON_5 << std::endl;
             continue;
         }
 
         if (line.starts_with(CITADEL_VAULT_SIG_START)) {
             std::cout << "Signature found! This Defcon Level is fully set up." << std::endl;
+            continue;
         }
 
         if (line.starts_with('#')) // support comments
