@@ -194,9 +194,9 @@ namespace Encryption {
         const auto tag_ptr = reinterpret_cast<unsigned char *>(tag.data());
         const auto key_ptr = reinterpret_cast<unsigned char *>(this->key_material.data());
 
-        const auto ret = aes_256_gcm_decrypt(ciphertext_ptr, cipherttxt.length(), key_ptr,
+        const auto ret = (aes_256_gcm_decrypt(ciphertext_ptr, cipherttxt.length(), key_ptr,
                                              reinterpret_cast<const unsigned char *>(iv.c_str()), plaintext_ptr,
-                                             plaintext_len, tag_ptr);
+                                             plaintext_len, tag_ptr) == 1);
 
         if (ret != 1) {
             logger.log(ERROR, "verify_defcon_signature()",

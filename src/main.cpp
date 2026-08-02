@@ -33,7 +33,11 @@ int main(int argc, char **argv) {
         std::cout << encryption_context.secret << std::endl;
     } else {
         encryption_context.receive_passphrase();
-        encryption_context.verify_defcon_signature({});
+
+        if (!encryption_context.verify_defcon_signature({})) {
+            exit(1);
+        }
+
         encryption_context.secret = std::move(config->value);
         auto encrypted_secret = encryption_context.encrypt_string();
         write_entry(config->key, encrypted_secret, *config);
