@@ -19,10 +19,10 @@ add_library(CitadelCore
 target_include_directories(CitadelCore PUBLIC ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(CitadelCore PUBLIC OpenSSL::Crypto)
 
-add_executable(Citadel
+add_executable(citadel
         src/main.cpp
 )
-target_link_libraries(Citadel PRIVATE CitadelCore)
+target_link_libraries(citadel PRIVATE CitadelCore)
 
 add_executable(CitadelParseTests
         test/parse_test.cpp
