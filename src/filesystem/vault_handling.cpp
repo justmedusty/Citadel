@@ -574,3 +574,4 @@ void create_vault(std::filesystem::path &vault_path) {
     vault << CITADEL_DEFCON_5 << std::endl;
     vault.close();
 }
+
