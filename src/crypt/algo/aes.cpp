@@ -30,33 +30,33 @@ bool aes_256_gcm_encrypt(unsigned char *plaintext, int plaintext_len, const unsi
 
     /* Create a context for the encrypt operation */
     if ((ctx = EVP_CIPHER_CTX_new()) == nullptr) {
-        logger.log(ERROR, "aes_256_gcm_encrypt()", "EVP_CIPHER_CTX_new() returned a null pointer");
+        logger.log(LogLevel::ERROR, "aes_256_gcm_encrypt()", "EVP_CIPHER_CTX_new() returned a null pointer");
         goto err;
     }
 
 
     /* Fetch the cipher implementation */
     if ((cipher = EVP_CIPHER_fetch(nullptr, "AES-256-GCM", nullptr)) == nullptr) {
-        logger.log(ERROR, "aes_256_gcm_encrypt()", "EVP_CIPHER_fetch() for cipher AES 256 GCM returned a null pointer");
+        logger.log(LogLevel::ERROR, "aes_256_gcm_encrypt()", "EVP_CIPHER_fetch() for cipher AES 256 GCM returned a null pointer");
         goto err;
     }
 
 
     if (!EVP_EncryptInit_ex2(ctx, cipher, key, iv, params)) {
-        logger.log(ERROR, "aes_256_gcm_encrypt()", "EVP_EncryptInit_ex2() returned a null pointer");
+        logger.log(LogLevel::ERROR, "aes_256_gcm_encrypt()", "EVP_EncryptInit_ex2() returned a null pointer");
         goto err;
     }
 
 
     /* Encrypt plaintext */
     if (!EVP_EncryptUpdate(ctx, ciphertext, ciphertext_len, plaintext, plaintext_len)) {
-        logger.log(ERROR, "aes_256_gcm_encrypt()", "EVP_EncryptUpdate() failed during the encryption process");
+        logger.log(LogLevel::ERROR, "aes_256_gcm_encrypt()", "EVP_EncryptUpdate() failed during the encryption process");
         goto err;
     }
 
     /* Finalise: note get no output for GCM */
     if (!EVP_EncryptFinal_ex(ctx, ciphertext, &tmplen)) {
-        logger.log(ERROR, "aes_256_gcm_encrypt()", "EVP_EncryptFinal_ex() failed during the final call");
+        logger.log(LogLevel::ERROR, "aes_256_gcm_encrypt()", "EVP_EncryptFinal_ex() failed during the final call");
         goto err;
     }
 
@@ -66,7 +66,7 @@ bool aes_256_gcm_encrypt(unsigned char *plaintext, int plaintext_len, const unsi
                                                   tag, 16);
 
     if (!EVP_CIPHER_CTX_get_params(ctx, params)) {
-        logger.log(ERROR, "aes_256_gcm_encrypt()",
+        logger.log(LogLevel::ERROR, "aes_256_gcm_encrypt()",
                    "EVP_CIPHER_CTX_get_params() failed while trying to get the GCM AEAD tag");
         goto err;
     }
@@ -98,7 +98,7 @@ bool aes_256_gcm_decrypt(const unsigned char *ciphertext, int ciphertext_len, co
     int rv;
 
     if ((ctx = EVP_CIPHER_CTX_new()) == nullptr) {
-        logger.log(ERROR, "aes_256_gcm_decrypt()",
+        logger.log(LogLevel::ERROR, "aes_256_gcm_decrypt()",
                    "EVP_CIPHER_CTX_new() returned a null pointer instead of a new context");
         goto err;
     }
@@ -106,7 +106,7 @@ bool aes_256_gcm_decrypt(const unsigned char *ciphertext, int ciphertext_len, co
     /* Fetch the cipher implementation */
     //nullptr for lib context and properties just resorts to default , we are fine with this
     if ((cipher = EVP_CIPHER_fetch(nullptr, "AES-256-GCM", nullptr)) == nullptr) {
-        logger.log(ERROR, "aes_256_gcm_decrypt()",
+        logger.log(LogLevel::ERROR, "aes_256_gcm_decrypt()",
                    "EVP_CIPHER_fetch() for algorithm AES 256 GCM returned a null pointer");
         goto err;
     }
@@ -117,7 +117,7 @@ bool aes_256_gcm_decrypt(const unsigned char *ciphertext, int ciphertext_len, co
      * IV length parameter.
      */
     if (!EVP_DecryptInit_ex2(ctx, cipher, key, iv, params)) {
-        logger.log(ERROR, "aes_256_gcm_decrypt()",
+        logger.log(LogLevel::ERROR, "aes_256_gcm_decrypt()",
                    "EVP_DecryptInit_ex2() failed, initialization of decryption operation cannot proceed");
         goto err;
     }
@@ -125,7 +125,7 @@ bool aes_256_gcm_decrypt(const unsigned char *ciphertext, int ciphertext_len, co
 
     /* Decrypt plaintext */
     if (!EVP_DecryptUpdate(ctx, plaintext, &plaintext_len, ciphertext, ciphertext_len)) {
-        logger.log(ERROR, "aes_256_gcm_decrypt()", "EVP_DecryptUpdate() failed during decryption process");
+        logger.log(LogLevel::ERROR, "aes_256_gcm_decrypt()", "EVP_DecryptUpdate() failed during decryption process");
         goto err;
     }
 
@@ -135,7 +135,7 @@ bool aes_256_gcm_decrypt(const unsigned char *ciphertext, int ciphertext_len, co
                                                   (void *) tag, sizeof(tag));
 
     if (!EVP_CIPHER_CTX_set_params(ctx, params)) {
-        logger.log(ERROR, "aes_256_gcm_decrypt()",
+        logger.log(LogLevel::ERROR, "aes_256_gcm_decrypt()",
                    "EVP_CIPHER_CTX_set_params() failed while trying to set the expected AEAD tag value");
         goto err;
     }
@@ -145,7 +145,7 @@ bool aes_256_gcm_decrypt(const unsigned char *ciphertext, int ciphertext_len, co
 
     tag_authenticated = rv > 0;
     if (tag_authenticated) {
-        logger.log(INFO, "aes_256_gcm_decrypt()", "AES 256 GCM AEAD Tag is valid");
+        logger.log(LogLevel::INFO, "aes_256_gcm_decrypt()", "AES 256 GCM AEAD Tag is valid");
         ret = 1;
     } else {
         std::cerr << "The provided password is incorrect" << std::endl;

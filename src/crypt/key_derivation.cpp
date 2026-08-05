@@ -76,7 +76,7 @@ int derive_key(
     argon2MB = std::max(argon2MB, static_cast<uint64_t>(1024)); // floor: 1 GB
     argon2MB = std::min(argon2MB, static_cast<uint64_t>(12288)); // ceil:  12 GB
 
-    logger.log(DEBUG, "derive_key()",
+    logger.log(LogLevel::DEBUG, "derive_key()",
                std::format("Amount of system memory available: {}MB , amount after checking min and max {}MB",
                            systemMemory,
                            argon2MB));
@@ -111,11 +111,11 @@ int derive_key(
     uint32_t m_cost = static_cast<uint32_t>((argon2MB * 1024) / memory_divisor); // Argon2 takes KB for the m_cost param
 
     uint32_t iterations = ARGON2_ROUNDS_BASE + defcon_boost;
-    logger.log(DEBUG, "derive_key()",
+    logger.log(LogLevel::DEBUG, "derive_key()",
                std::format("Your argon2 memory cost is {} and your iterations count is {}", m_cost, iterations));
     uint32_t parallelism = std::thread::hardware_concurrency(); // num lanes will be the number of cores on the system
 
-    logger.log(DEBUG, "derive_key()",
+    logger.log(LogLevel::DEBUG, "derive_key()",
                std::format("Reported cpucount is {}", parallelism));
 
     OSSL_PARAM params[] = {
@@ -129,19 +129,19 @@ int derive_key(
 
     EVP_KDF *kdf = EVP_KDF_fetch(nullptr, "ARGON2ID", nullptr);
     if (!kdf) {
-        logger.log(ERROR, "derive_key()", "EVP_KDF_fetch failed");
+        logger.log(LogLevel::ERROR, "derive_key()", "EVP_KDF_fetch failed");
         exit(1);
     }
 
     EVP_KDF_CTX *ctx = EVP_KDF_CTX_new(kdf);
     EVP_KDF_free(kdf);
     if (!ctx) {
-        logger.log(ERROR, "derive_key()", "EVP_KDF_CTX_new failed");
+        logger.log(LogLevel::ERROR, "derive_key()", "EVP_KDF_CTX_new failed");
         exit(1);
     }
 
     if (int ret; (ret = EVP_KDF_derive(ctx, reinterpret_cast<unsigned char *>(key.data()), keylen, params)) != 1) {
-        logger.log(ERROR, "derive_key()",
+        logger.log(LogLevel::ERROR, "derive_key()",
                    std::format("EVP_KDF_derive failed: {}", *ERR_error_string(ERR_get_error(), nullptr)));
 
         EVP_KDF_CTX_free(ctx);
@@ -154,7 +154,7 @@ int derive_key(
 
 //generate a random salt (do this once, store alongside ciphertext)
 void generate_salt(std::vector<uint8_t> &salt_buf) {
-    logger.log(DEBUG, "generate_salt()", std::format("Generating salt of size {}", KDF_SALT_SIZE_BYTES));
+    logger.log(LogLevel::DEBUG, "generate_salt()", std::format("Generating salt of size {}", KDF_SALT_SIZE_BYTES));
     int len = KDF_SALT_SIZE_BYTES;
     salt_buf.resize(len);
     RAND_bytes(salt_buf.data(), len);

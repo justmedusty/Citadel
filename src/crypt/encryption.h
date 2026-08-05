@@ -55,7 +55,7 @@ namespace Encryption {
         }
 
         ~EncryptionContext() {
-            logger.log(INFO, "~EncryptionContext()", "Secure destruction initialized...");
+            logger.log(LogLevel::INFO, "~EncryptionContext()", "Secure destruction initialized...");
             OPENSSL_cleanse(this->passphrase.data(), this->passphrase.size());
             OPENSSL_cleanse(this->confirm_passphrase.data(), this->confirm_passphrase.size());
             OPENSSL_cleanse(this->key_material.data(), this->key_material.size());

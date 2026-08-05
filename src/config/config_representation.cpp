@@ -50,6 +50,7 @@ std::filesystem::path ConfigRepresentation::get_home_directory() {
 
 void ConfigRepresentation::parse_command_line_args(std::vector<std::string> arguments) {
     bool ls = false;
+    bool loglevel_set = false;
     //Set a default value if the user does not specify it will go to defcon5
     this->defcon = Defcon::DEFCON5;
     for (auto arg = arguments.begin(); arg != arguments.end(); ++arg) {
@@ -61,6 +62,26 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
             //we do not list it right away since they may pass us a different vault file via a commandline option instead of the default vault file, we do it
             //after parsing
             ls = true;
+            continue;
+        }
+
+        if (*arg == FLAG_LOG_LEVEL) {
+            auto loglevel = *++arg;
+            if (loglevel == "debug") {
+                logger.set_loglevel(LogLevel::DEBUG);
+            } else if (loglevel == "info") {
+                logger.set_loglevel(LogLevel::INFO);
+            } else if (loglevel == "warn") {
+                logger.set_loglevel(LogLevel::WARN);
+            } else if (loglevel == "error") {
+                logger.set_loglevel(LogLevel::ERROR);
+            } else if (loglevel == "critical") {
+                logger.set_loglevel(LogLevel::CRITICAL);
+            } else {
+                logger.set_loglevel(LogLevel::ERROR);
+            }
+            loglevel_set = true;
+            continue;
         }
 
         if ((*arg) == FLAG_ENCRYPT) {
@@ -172,10 +193,13 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
             OPENSSL_cleanse(this->value.data(), this->value.size());
         }
         std::cerr <<
-                "You have no specified a value and are trying to encrypt! You must provide a value! Try citadel -h for help!"
+                "You have not specified a value and are trying to encrypt! You must provide a value! Try citadel -h for help!"
                 <<
                 std::endl;
         exit(1);
+    }
+    if (!loglevel_set) {
+        logger.set_loglevel(LogLevel::ERROR);
     }
 }
 

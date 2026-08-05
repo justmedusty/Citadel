@@ -29,6 +29,7 @@ enum class EncryptionMode;
 #define FLAG_VAULT_FILE_LOCATION "-vf"
 #define FLAG_DEFCON_LEVEL_TO_ENCRYPT "-defcon"
 #define FLAG_LIST_ALL_KEYS "-ls"
+#define FLAG_LOG_LEVEL "-loglevel"
 
 
 #define FILE_NO_OBFUSCATION_CONFIG_KEY "no_obfuscation"
@@ -91,7 +92,7 @@ struct ConfigRepresentation {
         vault_file_path = std::move(get_home_directory());
 
         if (!std::filesystem::exists(vault_file_path)) {
-            logger.log(DEBUG, "create_vault()", "Creating vault in users home directory...");
+            logger.log(LogLevel::DEBUG, "create_vault()", "Creating vault in users home directory...");
             create_vault(vault_file_path);
         }
 
@@ -132,6 +133,8 @@ private:
                 "-defcon -> precedes an integer (1,2,3,4,5) for an ENCRYPT operation only, specifies where the new entry should go"
                 << std::endl <<
                 "-ls -> lists all entries in your vault" << std::endl <<
+                "-v -> verbosity/log level, precedes an acceptable values are debug, info, warn, error, critical. Default is error."
+                << std::endl <<
                 "-repass -> precedes a DEFCON option, DEFCON1 for defcon 1 and so on. Changes the password for that entire section of the vault. You must verify the current password first."
                 << std::endl << std::endl <<
                 "This program has 5 separate levels of the vault:" << std::endl <<

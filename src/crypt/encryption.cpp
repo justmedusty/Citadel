@@ -34,7 +34,7 @@ namespace Encryption {
         //THIS SHOULD HAVE MCL_CURRENT AND MCL_FUTURE FOR NOW JUST MCL FUTURE SINCE IT NEEDS ADDDED CAPS FOR BOTH
         if (mlockall(MCL_FUTURE) < 0) {
             // lock all current and future pages into main memory
-            logger.log(ERROR, "lock_memory()",
+            logger.log(LogLevel::ERROR, "lock_memory()",
                        "mlockall failed, exiting early for security purposes. Check memory availability/consumption and try again.");
             exit(1);
         }
@@ -43,7 +43,7 @@ namespace Encryption {
         VirtualLock(ptr, size);
         return 1;
 #else
-        logger.log(ERROR, "lock_memory()",
+        logger.log(LogLevel::ERROR, "lock_memory()",
                    "Memory lock cannot be attained as this program is neither POSIX nor WIN32, this is not a massive risk since this program is short lived, but paging to disk can compromise program security");
         return 0;
 #endif
@@ -60,7 +60,7 @@ namespace Encryption {
 
     void set_stdin_echo(bool enable) {
         if (!stdin_terminal()) {
-            logger.log(WARN, "set_stdin_echo()",
+            logger.log(LogLevel::WARN, "set_stdin_echo()",
                        "stdin is NOT a terminal, this is not standard usage of this application");
             return;
         }
@@ -82,7 +82,7 @@ namespace Encryption {
 #else
         termios tty;
         if (tcgetattr(STDIN_FILENO, &tty) != 0) {
-            logger.log(ERROR, "stdin_terminal()", "tcgetattr failed");
+            logger.log(LogLevel::ERROR, "stdin_terminal()", "tcgetattr failed");
             return;
         }
         if (!enable) {
@@ -91,7 +91,7 @@ namespace Encryption {
             tty.c_lflag |= ECHO;
         }
         if (tcsetattr(STDIN_FILENO, TCSANOW, &tty) != 0) {
-            logger.log(ERROR, "stdin_terminal()", "tcsetattr failed");
+            logger.log(LogLevel::ERROR, "stdin_terminal()", "tcsetattr failed");
         }
 #endif
     }
@@ -137,7 +137,7 @@ namespace Encryption {
 
             if (here) {
                 if (!line.starts_with(CITADEL_VAULT_SIG_START)) {
-                    logger.log(WARN, "get_signature()", "Cannot find a valid signature in vault file");
+                    logger.log(LogLevel::WARN, "get_signature()", "Cannot find a valid signature in vault file");
                     return "";
                 }
                 std::string sig = line.substr(sizeof(CITADEL_VAULT_SIG_START) - 1,
@@ -146,13 +146,13 @@ namespace Encryption {
                                                   2));
 
                 std::cout << "SIG FETCHED IS " << sig << std::endl;
-                logger.log(INFO, "get_signature()",
+                logger.log(LogLevel::INFO, "get_signature()",
                            std::format("Fetching signature for DEFCON{} , signature is : {}",
                                        static_cast<int>(current_defcon), *sig.c_str()));
                 return sig;
             }
         }
-        logger.log(CRITICAL, "get_signature()",
+        logger.log(LogLevel::CRITICAL, "get_signature()",
                    "End of get_signature reached, this is a major bug! Please report to developer");
         return "";
     }
@@ -168,7 +168,7 @@ namespace Encryption {
                                                           decoded_signature.length());
 
 
-        logger.log(DEBUG, "decrypt_string()", "Finishing cleaning up salt, iv, tag, ciphertext...");
+        logger.log(LogLevel::DEBUG, "decrypt_string()", "Finishing cleaning up salt, iv, tag, ciphertext...");
 
         std::vector<uint8_t> salt_vec(salt.begin(), salt.end());
 
@@ -199,13 +199,13 @@ namespace Encryption {
                                              plaintext_len, tag_ptr) == 1);
 
         if (ret != 1) {
-            logger.log(ERROR, "verify_defcon_signature()",
+            logger.log(LogLevel::ERROR, "verify_defcon_signature()",
                        "Encryption verification failed");
             return false;
         }
 
         if (!plaintext.contains(expected)) {
-            logger.log(ERROR, "verify_defcon_signature()",
+            logger.log(LogLevel::ERROR, "verify_defcon_signature()",
                        "Expected does NOT equal plaintext");
             return false;
         }
@@ -223,7 +223,7 @@ namespace Encryption {
         std::string cipherttxt = decoded.substr(KDF_SALT_SIZE_BYTES + AES_GCM_IV_LEN + AES_GCM_AEAD_TAG_SIZE,
                                                 decoded.length());
 
-        logger.log(DEBUG, "decrypt_string()", "Finishing cleaning up salt, iv, tag, ciphertext...");
+        logger.log(LogLevel::DEBUG, "decrypt_string()", "Finishing cleaning up salt, iv, tag, ciphertext...");
 
         std::vector<uint8_t> salt_vec(salt.begin(), salt.end());
 
@@ -245,10 +245,10 @@ namespace Encryption {
         const auto iv_ptr = reinterpret_cast<unsigned char *>(this->iv.data());
 
         int plaintext_len = cipherttxt.length();
-        logger.log(DEBUG, "decrypt_string()", "Calling into aes_256_gcm_decrypt...");
+        logger.log(LogLevel::DEBUG, "decrypt_string()", "Calling into aes_256_gcm_decrypt...");
         auto ret = aes_256_gcm_decrypt(ciphertext_ptr, cipherttxt.size(), key_ptr, iv_ptr, plaintext_ptr, plaintext_len,
                                        tag_ptr);
-        logger.log(DEBUG, "decrypt_string()", "Returned from aes_256_gcm_decrypt...");
+        logger.log(LogLevel::DEBUG, "decrypt_string()", "Returned from aes_256_gcm_decrypt...");
 
         if (!ret) {
             std::cerr << "Decryption failed" << std::endl;
@@ -281,7 +281,7 @@ namespace Encryption {
         auto ret = derive_key(this->passphrase, this->kdf_salt, this->key_material, this->current_defcon);
 
         if (ret != 1) {
-            logger.log(ERROR, "encrypt_string()", "An error occurred while trying to derive key");
+            logger.log(LogLevel::ERROR, "encrypt_string()", "An error occurred while trying to derive key");
             delete this;
             exit(1);
         }
@@ -299,7 +299,7 @@ namespace Encryption {
                                   reinterpret_cast<unsigned char *>(tag.data()));
 
         if (!ret) {
-            logger.log(ERROR, "encrypt_string()", "aes_256_gcm_encrypt call has failed");
+            logger.log(LogLevel::ERROR, "encrypt_string()", "aes_256_gcm_encrypt call has failed");
             delete this;
             exit(1);
         }

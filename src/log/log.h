@@ -17,12 +17,6 @@ enum class LogLevel {
     CRITICAL = 4
 };
 
-#define DEBUG LogLevel::DEBUG
-#define INFO LogLevel::INFO
-#define WARN LogLevel::WARN
-#define ERROR LogLevel::ERROR
-#define CRITICAL LogLevel::CRITICAL
-
 
 #define LOGLEVEL DEBUG
 
@@ -30,7 +24,7 @@ struct Logger {
     LogLevel level;
 
     Logger() {
-        this->level = WARN;
+        this->level = LogLevel::WARN;
     }
 
     explicit Logger(LogLevel level) {
@@ -42,26 +36,31 @@ struct Logger {
             return;
         }
         switch (log_level) {
-            case DEBUG:
+            case LogLevel::DEBUG:
                 std::cout << "[DEBUG] in function: " << function << " -> " << message << std::endl;
                 break;
-            case INFO:
+            case LogLevel::INFO:
                 std::cout << "[INFO] in function: " << function << " -> " << message << std::endl;
                 break;
-            case WARN:
+            case LogLevel::WARN:
                 std::cout << "[WARN] in function: " << function << " -> " << message << std::endl;
                 break;
-            case ERROR:
+            case LogLevel::ERROR:
                 std::cerr << "[ERROR] in function: " << function << " -> " << message << std::endl;
                 break;
-            case CRITICAL:
+            case LogLevel::CRITICAL:
                 std::cerr << "[CRITICAL] in function: " << function << " -> " << message << std::endl;
                 break;
         }
     }
+
+    void set_loglevel(LogLevel loglevel) {
+        this->level = loglevel;
+    }
 };
 
-static inline auto logger = Logger(LOGLEVEL);
+
+static inline auto logger = Logger(LogLevel::WARN);
 //we will eventually parse this from a config file or just command line but for now we'll use a constant one
 
 #endif //LIBREVAULT_LOG_H

@@ -108,7 +108,7 @@ int8_t is_vault_setup(std::filesystem::path &vault_file_path) {
     }
 
     if (found > 0 || sig > 0) {
-        logger.log(INFO, "is_vault_setup()",
+        logger.log(LogLevel::INFO, "is_vault_setup()",
                    "Not all defcon levels have an associated verification signature. This will not prevent this program from running, but you will need to set a password for any DEFCON section without an associated signature."
         );
     }
@@ -336,7 +336,7 @@ std::vector<std::string> read_many_entries(std::vector<std::string> &keys, Confi
             }
 
             if (line.starts_with(CITADEL_VAULT_SIG_START)) {
-                logger.log(DEBUG, "read_entry()",
+                logger.log(LogLevel::DEBUG, "read_entry()",
                            std::format("Signature for Defcon{} is {}", static_cast<int>(defcon), *line.c_str()));
                 sig = line.replace(line.find(CITADEL_VAULT_SIG_START), strlen(CITADEL_VAULT_SIG_START) - 1, "").replace(
                     line.find(CITADEL_VAULT_SIG_END), strlen(CITADEL_VAULT_SIG_END) - 1, "");
@@ -349,8 +349,8 @@ std::vector<std::string> read_many_entries(std::vector<std::string> &keys, Confi
             std::string v = line.substr(line.find('=') + 1, line.size() - line.find('=') - 1);
 
 
-            logger.log(DEBUG, "read_many_entries()", k);
-            logger.log(DEBUG, "read_many_entries()", v);
+            logger.log(LogLevel::DEBUG, "read_many_entries()", k);
+            logger.log(LogLevel::DEBUG, "read_many_entries()", v);
 
             if (k == key) {
                 found = true;
@@ -411,7 +411,7 @@ Defcon read_entry(std::string &key, std::string &value, ConfigRepresentation &co
         }
 
         if (line.starts_with(CITADEL_VAULT_SIG_START)) {
-            logger.log(DEBUG, "read_entry()",
+            logger.log(LogLevel::DEBUG, "read_entry()",
                        std::format("Signature for Defcon{} is {}", static_cast<int>(defcon), *line.c_str()));
             sig = line.replace(line.find(CITADEL_VAULT_SIG_START), strlen(CITADEL_VAULT_SIG_START) - 1, "").replace(
                 line.find(CITADEL_VAULT_SIG_END), strlen(CITADEL_VAULT_SIG_END) - 1, "");
@@ -422,9 +422,6 @@ Defcon read_entry(std::string &key, std::string &value, ConfigRepresentation &co
 
         std::string k = line.substr(0, line.find('='));
         std::string v = line.substr(line.find('=') + 1, line.size() - line.find('=') - 1);
-
-
-        std::cout << k << ":" << v << std::endl;
 
         if (k == key) {
             value = std::move(v);
@@ -551,7 +548,7 @@ void delete_entry(std::string &key, ConfigRepresentation &config) {
 }
 
 void create_vault(std::filesystem::path &vault_path) {
-    logger.log(DEBUG, "create_vault()", vault_path);
+    logger.log(LogLevel::DEBUG, "create_vault()", vault_path);
     if (std::filesystem::exists(vault_path)) {
         std::cerr << vault_path << " already exists!" << std::endl;
         exit(1);
