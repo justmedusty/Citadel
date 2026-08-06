@@ -12,7 +12,9 @@ int main(int argc, char **argv) {
     const std::vector<std::string> arguments(argv + 1, argv + argc);
     auto config = new ConfigRepresentation();
     config->parse_command_line_args(arguments);
+
     logger.log(LogLevel::DEBUG, "main()", "attempting to lock memory...");
+
     Encryption::lock_memory();
     Encryption::EncryptionContext encryption_context(*config);
     auto ret = is_vault_setup(config->vault_file_path);

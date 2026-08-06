@@ -29,6 +29,8 @@ enum class EncryptionMode;
 #define FLAG_VAULT_FILE_LOCATION "-vf"
 #define FLAG_DEFCON_LEVEL_TO_ENCRYPT "-defcon"
 #define FLAG_LIST_ALL_KEYS "-ls"
+#define FLAG_DELETE_KEY "-dk"
+#define FLAG_REPASS_DEFCON_LEVEL "-repass"
 #define FLAG_LOG_LEVEL "-loglevel"
 
 

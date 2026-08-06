@@ -60,7 +60,7 @@ struct Logger {
 };
 
 
-static inline auto logger = Logger(LogLevel::WARN);
+inline auto logger = Logger(LogLevel::WARN);
 //we will eventually parse this from a config file or just command line but for now we'll use a constant one
 
 #endif //LIBREVAULT_LOG_H

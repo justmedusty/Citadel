@@ -195,8 +195,8 @@ namespace Encryption {
         const auto key_ptr = reinterpret_cast<unsigned char *>(this->key_material.data());
 
         const auto ret = (aes_256_gcm_decrypt(ciphertext_ptr, cipherttxt.length(), key_ptr,
-                                             reinterpret_cast<const unsigned char *>(iv.c_str()), plaintext_ptr,
-                                             plaintext_len, tag_ptr) == 1);
+                                              reinterpret_cast<const unsigned char *>(iv.c_str()), plaintext_ptr,
+                                              plaintext_len, tag_ptr) == 1);
 
         if (ret != 1) {
             logger.log(LogLevel::ERROR, "verify_defcon_signature()",
@@ -254,8 +254,6 @@ namespace Encryption {
             std::cerr << "Decryption failed" << std::endl;
             exit(1);
         }
-
-
     }
 
     std::string EncryptionContext::generate_signature() {
@@ -334,6 +332,7 @@ namespace Encryption {
         std::cin >> passphrase;
 
         set_stdin_echo(true);
+        std::cout << std::endl;
     }
 
 
@@ -353,5 +352,6 @@ namespace Encryption {
         std::cin >> confirm_passphrase;
 
         set_stdin_echo(true);
+        std::cout << std::endl;
     }
 };

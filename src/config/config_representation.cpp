@@ -65,6 +65,14 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
             continue;
         }
 
+        if (*arg == FLAG_DELETE_KEY) {
+            continue;
+        }
+
+        if (*arg == FLAG_REPASS_DEFCON_LEVEL) {
+            continue;
+        }
+
         if (*arg == FLAG_LOG_LEVEL) {
             auto loglevel = *++arg;
             if (loglevel == "debug") {
