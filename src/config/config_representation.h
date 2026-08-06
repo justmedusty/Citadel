@@ -135,7 +135,7 @@ private:
                 "-defcon -> precedes an integer (1,2,3,4,5) for an ENCRYPT operation only, specifies where the new entry should go"
                 << std::endl <<
                 "-ls -> lists all entries in your vault" << std::endl <<
-                "-v -> verbosity/log level, precedes an acceptable values are debug, info, warn, error, critical. Default is error."
+                "-loglevel -> verbosity/log level, precedes an acceptable value, acceptable values are debug, info, warn, error, critical. Default is error."
                 << std::endl <<
                 "-repass -> precedes a DEFCON option, DEFCON1 for defcon 1 and so on. Changes the password for that entire section of the vault. You must verify the current password first."
                 << std::endl << std::endl <<
