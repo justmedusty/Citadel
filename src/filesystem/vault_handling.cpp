@@ -476,7 +476,6 @@ void list_all_entries(const ConfigRepresentation &config) {
         }
 
         if (line.starts_with(CITADEL_VAULT_SIG_START)) {
-            std::cout << "Signature found! This Defcon Level is fully set up." << std::endl;
             continue;
         }
 
@@ -533,7 +532,7 @@ void delete_entry(std::string &key, ConfigRepresentation &config) {
 
     vault.close();
     temp.close();
-    std::filesystem::rename(config.vault_file_path, config.vault_file_path.append(".old"));
+    std::filesystem::rename(config.vault_file_path, config.vault_file_path.string() + ".old");
     // gives you one chance if you fuck up
     std::filesystem::rename(temp_path, config.vault_file_path);
 
@@ -542,9 +541,11 @@ void delete_entry(std::string &key, ConfigRepresentation &config) {
         exit(1);
     }
 
-    std::cout << "Key : " << key << "removed." <<
-            "This deletion is recoverable until your next deletion and the backup is located at " << config.
-            vault_file_path << ".old" << std::endl;
+    std::cout << "Key: " << key << " removed from your vault. " <<
+            "This deletion is recoverable until your next deletion and the backup is located at the same location as your vault ( " << config.
+            vault_file_path << ") with a .old appended extension at the end of the filename." << std::endl;
+
+    exit(0);
 }
 
 void create_vault(std::filesystem::path &vault_path) {

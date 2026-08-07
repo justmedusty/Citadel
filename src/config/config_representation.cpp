@@ -51,6 +51,7 @@ std::filesystem::path ConfigRepresentation::get_home_directory() {
 void ConfigRepresentation::parse_command_line_args(std::vector<std::string> arguments) {
     bool ls = false;
     bool loglevel_set = false;
+    bool delete_key = false;
     //Set a default value if the user does not specify it will go to defcon5
     this->defcon = Defcon::DEFCON5;
     for (auto arg = arguments.begin(); arg != arguments.end(); ++arg) {
@@ -66,6 +67,7 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
         }
 
         if (*arg == FLAG_DELETE_KEY) {
+            delete_key = true;
             continue;
         }
 
@@ -190,9 +192,19 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
         list_all_entries(*this);
     }
 
+
+    if (!loglevel_set) {
+        logger.set_loglevel(LogLevel::ERROR);
+    }
+
+
     if (this->key.empty()) {
         std::cerr << "You have not specified a key! You must provide a key! Try citadel -h for help!" << std::endl;
         exit(1);
+    }
+
+    if (delete_key == true) {
+        delete_entry(key, *this);
     }
 
     if (this->decrypt == false && this->value.empty()) {
@@ -205,9 +217,6 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
                 <<
                 std::endl;
         exit(1);
-    }
-    if (!loglevel_set) {
-        logger.set_loglevel(LogLevel::ERROR);
     }
 }
 
