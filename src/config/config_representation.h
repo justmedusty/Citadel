@@ -128,8 +128,8 @@ private:
                 << std::endl <<
                 "-vf -> precedes a path string, points to a specific location for your vault file, main reason would be if your vault file is in a non-standard location such as a mounted flash drive"
                 << std::endl <<
-                "-k -> precedes the key to the value you are trying to retreive from the vault" << std::endl <<
-                "-v -> precedes the value FOR ENCRYPTION OPERATION ONLY." << std::endl <<
+                "-k -> precedes the key to the value you are trying to retrieve, insert, or delete from the vault" << std::endl <<
+                "-v -> precedes the value for a new value you are encrypting and inserting into the vault." << std::endl <<
                 "-h -> display the help message you are currently reading." << std::endl <<
                 "-dk -> delete a key and its associated value from the vault" << std::endl <<
                 "-defcon -> precedes an integer (1,2,3,4,5) for an ENCRYPT operation only, specifies where the new entry should go"
@@ -137,7 +137,7 @@ private:
                 "-ls -> lists all entries in your vault" << std::endl <<
                 "-loglevel -> verbosity/log level, precedes an acceptable value, acceptable values are debug, info, warn, error, critical. Default is error."
                 << std::endl <<
-                "-repass -> precedes a DEFCON option, DEFCON1 for defcon 1 and so on. Changes the password for that entire section of the vault. You must verify the current password first."
+                "-repass -> precedes a DEFCON option, 1 for DEFCON1 and so on. Changes the password for that entire section of the vault. You must verify the current password first."
                 << std::endl << std::endl <<
                 "This program has 5 separate levels of the vault:" << std::endl <<
                 "DEFCON1 -> MOST SERIOUS SECRETS, SHOULD HAVE FEW ENTRIES AND MAXIMALLY COMPLEX PASSWORD" << std::endl
