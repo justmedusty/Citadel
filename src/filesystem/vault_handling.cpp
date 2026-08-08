@@ -11,6 +11,8 @@
 #include <algorithm>
 #include <cstring>
 
+#include "crypt/encryption.h"
+
 
 std::string get_defcon_signature(std::string &vault_file_path, Defcon defcon) {
     std::ifstream vault(vault_file_path);
@@ -542,8 +544,83 @@ void delete_entry(std::string &key, ConfigRepresentation &config) {
     }
 
     std::cout << "Key: " << key << " removed from your vault. " <<
-            "This deletion is recoverable until your next deletion and the backup is located at the same location as your vault ( " << config.
+            "This deletion is recoverable until your next deletion and the backup is located at the same location as your vault ( "
+            << config.
             vault_file_path << ") with a .old appended extension at the end of the filename." << std::endl;
+
+    exit(0);
+}
+
+void rekey_defcon_level(Defcon defcon_level, ConfigRepresentation &config,
+                        Encryption::EncryptionContext decryption_encryption_context,
+                        Encryption::EncryptionContext new_key_encryption_context) {
+    std::ifstream vault(config.vault_file_path);
+    if (!vault.is_open()) {
+        std::cerr << "Could not open vault file: " << config.vault_file_path << std::endl;
+        exit(1);
+    }
+
+    if (std::filesystem::file_size(config.vault_file_path) > MAXIMUM_VAULT_SIZE) {
+        std::cerr << std::filesystem::file_size(config.vault_file_path)
+                << " is too large for Citadel to handle. Please investigate." << std::endl;
+        exit(1);
+    }
+
+    std::filesystem::path temp_path = config.vault_file_path;
+    temp_path += ".tmp";
+    std::ofstream temp(temp_path);
+    if (!temp.is_open()) {
+        std::cerr << "Could not create temp file" << std::endl;
+        exit(1);
+    }
+
+    std::string line;
+    bool in_defcon = false;
+    std::string current_defcon_string;
+
+    switch (defcon_level) {
+        case Defcon::DEFCON1:
+            current_defcon_string = CITADEL_DEFCON_1;
+            break;
+        case Defcon::DEFCON2:
+            current_defcon_string = CITADEL_DEFCON_2;
+            break;
+        case Defcon::DEFCON3:
+            current_defcon_string = CITADEL_DEFCON_3;
+            break;
+        case Defcon::DEFCON4:
+            current_defcon_string = CITADEL_DEFCON_4;
+            break;
+        case Defcon::DEFCON5:
+            current_defcon_string = CITADEL_DEFCON_5;
+            break;
+    }
+
+    while (std::getline(vault, line)) {
+        if (line.starts_with('#')) {
+            // support comments
+            temp << line << std::endl;
+            continue;
+        }
+        if (line.contains(current_defcon_string)) {
+            in_defcon = true;
+        }
+
+        if (line.starts_with(CITADEL_VAULT_SIG_START) && in_defcon) {
+
+        }
+
+        std::string k = line.substr(0, line.find('='));
+
+
+        temp << line << std::endl;
+    }
+
+    vault.close();
+    temp.close();
+    std::filesystem::rename(config.vault_file_path, config.vault_file_path.string() + ".old");
+    // gives you one chance if you fuck up
+    std::filesystem::rename(temp_path, config.vault_file_path);
 
     exit(0);
 }
