@@ -574,6 +574,11 @@ void rekey_defcon_level(Defcon defcon_level, ConfigRepresentation &config,
         exit(1);
     }
 
+    std::cout << "Prepare to enter your new password for the section of the vault you are wish to re-key (DEFCON" <<
+            static_cast<int>(defcon_level) << ")." << std::endl;
+
+    std::string new_sig = new_key_encryption_context.generate_signature();
+
     std::string line;
     bool in_defcon = false;
     std::string current_defcon_string;
@@ -602,15 +607,21 @@ void rekey_defcon_level(Defcon defcon_level, ConfigRepresentation &config,
             temp << line << std::endl;
             continue;
         }
+
+        if (line.contains("<DEFCON") && in_defcon) {
+            //we are entering a new defcon and thus no longer in the target defcon area
+            in_defcon = false;
+        }
         if (line.contains(current_defcon_string)) {
             in_defcon = true;
         }
 
         if (line.starts_with(CITADEL_VAULT_SIG_START) && in_defcon) {
-
         }
 
         std::string k = line.substr(0, line.find('='));
+
+        std::string v = line.substr(line.find('=') + 1, line.length());
 
 
         temp << line << std::endl;
