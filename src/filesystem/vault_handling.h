@@ -17,6 +17,10 @@
 #define DEFCON4_SIG_PRESENT (1 << 3)
 #define DEFCON5_SIG_PRESENT (1 << 4)
 
+namespace Encryption {
+    struct EncryptionContext;
+}
+
 enum class Defcon;
 struct ConfigRepresentation;
 
@@ -34,7 +38,12 @@ std::string get_defcon_signature(std::string &vault_file_path, Defcon defcon);
 
 void create_vault(std::filesystem::path &vault_path);
 
-std::vector<std::string> read_many_entries(std::vector<std::string>& keys, ConfigRepresentation &config,
+std::vector<std::string> read_many_entries(std::vector<std::string> &keys, ConfigRepresentation &config,
                                            std::string *signature);
+
 void list_all_entries(const ConfigRepresentation &config);
+
+void rekey_defcon_level(Defcon defcon_level, ConfigRepresentation &config,
+                        Encryption::EncryptionContext decryption_encryption_context,
+                        Encryption::EncryptionContext new_key_encryption_context);
 #endif //CITADEL_VAULT_HANDLING_H

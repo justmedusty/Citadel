@@ -52,6 +52,7 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
     bool ls = false;
     bool loglevel_set = false;
     bool delete_key = false;
+    bool rekey = false;
     //Set a default value if the user does not specify it will go to defcon5
     this->defcon = Defcon::DEFCON5;
     for (auto arg = arguments.begin(); arg != arguments.end(); ++arg) {
@@ -72,6 +73,7 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
         }
 
         if (*arg == FLAG_REPASS_DEFCON_LEVEL) {
+            rekey = true;
             continue;
         }
 
@@ -195,6 +197,13 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
 
     if (!loglevel_set) {
         logger.set_loglevel(LogLevel::ERROR);
+    }
+
+
+    if (rekey) {
+        Encryption::EncryptionContext encryption_context(*this);
+        Encryption::EncryptionContext decryption_context(*this);
+        rekey_defcon_level(this->defcon, *this, decryption_context, decryption_context);
     }
 
 

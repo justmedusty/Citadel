@@ -574,7 +574,17 @@ void rekey_defcon_level(Defcon defcon_level, ConfigRepresentation &config,
         exit(1);
     }
 
-    std::cout << "Prepare to enter your new password for the section of the vault you are wish to re-key (DEFCON" <<
+    std::cout << "Prepare to enter your OLD password for the section of the vault you are wish to re-key (DEFCON" <<
+            static_cast<int>(defcon_level) << ")." << std::endl;
+
+    auto ret = decryption_encryption_context.verify_defcon_signature(std::nullopt);
+
+    if (!ret) {
+        std::cerr << "Could not verify defcon signature with old password you provided." << std::endl;
+        exit(1);
+    }
+
+    std::cout << "Prepare to enter your NEW password for the section of the vault you are wishing to re-key (DEFCON" <<
             static_cast<int>(defcon_level) << ")." << std::endl;
 
     std::string new_sig = new_key_encryption_context.generate_signature();
@@ -617,11 +627,23 @@ void rekey_defcon_level(Defcon defcon_level, ConfigRepresentation &config,
         }
 
         if (line.starts_with(CITADEL_VAULT_SIG_START) && in_defcon) {
+            temp << CITADEL_VAULT_SIG_START << new_sig << CITADEL_VAULT_SIG_END << std::endl;
+            continue;
         }
 
-        std::string k = line.substr(0, line.find('='));
+        if (in_defcon) {
+            std::string k = line.substr(0, line.find('='));
 
-        std::string v = line.substr(line.find('=') + 1, line.length());
+            std::string v = line.substr(line.find('=') + 1, line.length());
+
+            decryption_encryption_context.decrypt_string(v);
+
+            new_key_encryption_context.secret = std::move(decryption_encryption_context.secret);
+
+            auto new_value = new_key_encryption_context.encrypt_string();
+            temp << k << "=" << new_value << std::endl;
+            continue;
+        }
 
 
         temp << line << std::endl;
