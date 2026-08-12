@@ -574,8 +574,13 @@ void rekey_defcon_level(Defcon defcon_level, ConfigRepresentation &config,
         exit(1);
     }
 
+    decryption_encryption_context.current_defcon = defcon_level;
+    new_key_encryption_context.current_defcon = defcon_level;
+
     std::cout << "Prepare to enter your OLD password for the section of the vault you are wish to re-key (DEFCON" <<
             static_cast<int>(defcon_level) << ")." << std::endl;
+
+    decryption_encryption_context.receive_passphrase();
 
     auto ret = decryption_encryption_context.verify_defcon_signature(std::nullopt);
 

@@ -8,6 +8,8 @@
 #include <limits>
 #include <stdexcept>
 #include <cctype>
+#include <iostream>
+#include <ostream>
 
 namespace Base64 {
    static const char b64_table[65] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -72,6 +74,7 @@ namespace Base64 {
             continue;
          }
          if ((c > 127) || (c < 0) || (reverse_table[c] > 63)) {
+            std::cout << "Invalid character found in base64.decode(): " << ascdata << std::endl;
             throw std::invalid_argument("This contains characters not legal in a base64 encoded string.");
          }
          accumulator = (accumulator << 6) | reverse_table[c];

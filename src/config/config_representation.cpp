@@ -72,10 +72,6 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
             continue;
         }
 
-        if (*arg == FLAG_REPASS_DEFCON_LEVEL) {
-            rekey = true;
-            continue;
-        }
 
         if (*arg == FLAG_LOG_LEVEL) {
             auto loglevel = *++arg;
@@ -106,7 +102,11 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
             continue;
         }
 
-        if (*arg == FLAG_DEFCON_LEVEL_TO_ENCRYPT) {
+        if (*arg == FLAG_REPASS_DEFCON_LEVEL) {
+            rekey = true;
+        }
+
+        if (*arg == FLAG_DEFCON_LEVEL_TO_ENCRYPT || *arg == FLAG_REPASS_DEFCON_LEVEL) {
             if (arg == arguments.end()) {
                 std::cerr <<
                         "You have passed a flag that requires a value, with no value given! You must provide a value when using the "
