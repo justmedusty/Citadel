@@ -626,9 +626,13 @@ void rekey_defcon_level(Defcon defcon_level, ConfigRepresentation &config,
         if (line.contains("<DEFCON") && in_defcon) {
             //we are entering a new defcon and thus no longer in the target defcon area
             in_defcon = false;
+            temp << line << std::endl;
+            continue;
         }
         if (line.contains(current_defcon_string)) {
             in_defcon = true;
+            temp << line << std::endl;
+            continue;
         }
 
         if (line.starts_with(CITADEL_VAULT_SIG_START) && in_defcon) {
