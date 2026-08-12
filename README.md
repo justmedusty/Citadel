@@ -14,7 +14,7 @@ It is intended to be used with the following flags :  <br>
 -defcon -> precedes an integer (1,2,3,4,5) for an ENCRYPT operation only, specifies where the new entry should go. <br>
 -ls -> lists all entries in your vault. <br>
 -loglevel -> verbosity/log level, precedes an acceptable value, acceptable values are debug, info, warn, error, critical. Default is error. <br>
--repass -> precedes a DEFCON option, DEFCON1 for defcon 1 and so on. Changes the password for that entire section of the vault. You must verify the current password first. <br>
+-repass -> precedes a DEFCON option, 1 for defcon 1 and so on. Changes the password for that entire section of the vault. You must verify the current password first. <br>
 <br>
 <br>
 The argon2 parameters are cranked up or down depending on the defcon level, so be aware defcon1 secrets take a while to encrypt and decrypt. It truly is meant for the most sensitive secrets, otherwise lower levels will be quicker while still retaining an acceptable security profile. <br>
