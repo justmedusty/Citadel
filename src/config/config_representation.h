@@ -32,6 +32,7 @@ enum class EncryptionMode;
 #define FLAG_DELETE_KEY "-dk"
 #define FLAG_REPASS_DEFCON_LEVEL "-repass"
 #define FLAG_LOG_LEVEL "-loglevel"
+#define FLAG_DECRYPT_ALL_KEYS "-allkeys"
 
 
 #define FILE_NO_OBFUSCATION_CONFIG_KEY "no_obfuscation"
@@ -132,7 +133,8 @@ private:
                 "-v -> precedes the value for a new value you are encrypting and inserting into the vault." << std::endl <<
                 "-h -> display the help message you are currently reading." << std::endl <<
                 "-dk -> delete a key and its associated value from the vault" << std::endl <<
-                "-defcon -> precedes an integer (1,2,3,4,5) for an ENCRYPT operation only, specifies where the new entry should go"
+                "-defcon -> precedes an integer (1,2,3,4,5) for an ENCRYPT operation only, specifies where the new entry should go" << std::endl <<
+                    "-allkeys -> precedes an integer (1,2,3,4,5) for defcon level, will gather and decrypt every key in that defcon level in one operation"
                 << std::endl <<
                 "-ls -> lists all entries in your vault" << std::endl <<
                 "-loglevel -> verbosity/log level, precedes an acceptable value, acceptable values are debug, info, warn, error, critical. Default is error."

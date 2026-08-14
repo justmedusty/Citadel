@@ -376,7 +376,7 @@ std::vector<std::string> read_all_entries(ConfigRepresentation &config,
 
             logger.log(LogLevel::DEBUG, "read_many_entries()", k);
             logger.log(LogLevel::DEBUG, "read_many_entries()", v);
-            values.push_back(line); //Should we return the line for another function to be able to pritn the key or just pass values back? Probably best to pass the whole line and let another function parse the lines
+            values.push_back(line); //Should we return the line for another function to be able to print the key or just pass values back? Probably best to pass the whole line and let another function parse the lines
             *signature = std::move(sig);
         }
     }

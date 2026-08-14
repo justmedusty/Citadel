@@ -53,6 +53,7 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
     bool loglevel_set = false;
     bool delete_key = false;
     bool rekey = false;
+    bool decrypt_all = false;
     //Set a default value if the user does not specify it will go to defcon5
     this->defcon = Defcon::DEFCON5;
     for (auto arg = arguments.begin(); arg != arguments.end(); ++arg) {
@@ -181,6 +182,49 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
             ++arg;
             continue;
         }
+
+        if (*arg == FLAG_DECRYPT_ALL_KEYS) {
+            if (arg == arguments.end()) {
+                std::cerr <<
+                        "You have passed a flag that requires a value, with no value given! You must provide a value when using the "
+                        << FLAG_DECRYPT_ALL_KEYS << " flag." << std::endl;
+            }
+
+            decrypt_all = true;
+
+            ++arg;
+
+            /*
+             *  The way we are parsing this is forgiving , 12434534 would be 1 , 23453456, would be 2 etc.
+             */
+
+            switch (arg->data()[0]) {
+                case '1':
+                    this->defcon = Defcon::DEFCON1;
+                    break;
+                case '2':
+                    this->defcon = Defcon::DEFCON2;
+                    break;
+                case '3':
+                    this->defcon = Defcon::DEFCON3;
+                    break;
+                case '4':
+                    this->defcon = Defcon::DEFCON4;
+                    break;
+                case '5':
+                    this->defcon = Defcon::DEFCON5;
+                    break;
+                default:
+                    std::cerr << *arg << " is an invalid defcon value, {1,2,3,4,5} are the valid values." << std::endl;
+                    /*
+                     * We may want to cleanse all of these arg values in case user passes something sensitive accidentally, but for now we won't
+                     */
+                    exit(1);
+            }
+
+
+
+        }
     }
 
 
@@ -214,6 +258,10 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
 
     if (delete_key == true) {
         delete_entry(key, *this);
+    }
+
+    if (decrypt_all == true) {
+        //TODO
     }
 
     if (this->decrypt == false && this->value.empty()) {
