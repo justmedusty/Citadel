@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
     Encryption::EncryptionContext encryption_context(*config);
     auto ret = is_vault_setup(config->vault_file_path);
 
-    if (!(ret & (1 << (static_cast<int>(config->defcon) - 1)))) {
+    if (config->decrypt == false && !(ret & (1 << (static_cast<int>(config->defcon) - 1)))) {
         std::string sig = encryption_context.generate_signature();
         write_signature(sig, encryption_context.current_defcon, *config);
     }
