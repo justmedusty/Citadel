@@ -221,9 +221,6 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
                      */
                     exit(1);
             }
-
-
-
         }
     }
 
@@ -250,6 +247,12 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
         rekey_defcon_level(this->defcon, *this, decryption_context, decryption_context);
     }
 
+    if (decrypt_all == true) {
+        Encryption::EncryptionContext decryption_context(*this);
+        std::string sig;
+        auto values = read_all_entries(*this, &sig);
+        handle_value_list(values, decryption_context);
+    }
 
     if (this->key.empty()) {
         std::cerr << "You have not specified a key! You must provide a key! Try citadel -h for help!" << std::endl;
@@ -260,9 +263,6 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
         delete_entry(key, *this);
     }
 
-    if (decrypt_all == true) {
-        //TODO
-    }
 
     if (this->decrypt == false && this->value.empty()) {
         if (!this->value.empty()) {

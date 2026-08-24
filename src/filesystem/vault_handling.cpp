@@ -10,9 +10,28 @@
 #include <string>
 #include <algorithm>
 #include <cstring>
+#include <boost/mpl/aux_/na_fwd.hpp>
 
 #include "crypt/encryption.h"
 
+std::string defcon_level_to_string(const Defcon defcon) {
+    switch (defcon) {
+        case Defcon::DEFCON1:
+            return CITADEL_DEFCON_1;
+        case Defcon::DEFCON2:
+            return CITADEL_DEFCON_2;
+        case Defcon::DEFCON3:
+            return CITADEL_DEFCON_3;
+        case Defcon::DEFCON4:
+            return CITADEL_DEFCON_4;
+        case Defcon::DEFCON5:
+            return CITADEL_DEFCON_5;
+    };
+
+    logger.log(LogLevel::ERROR, "defcon_level_to_string",
+               "function called with an unset defcon variable! This is invalid behavior.");
+    exit(1);
+}
 
 std::string get_defcon_signature(std::string &vault_file_path, Defcon defcon) {
     std::ifstream vault(vault_file_path);
@@ -143,25 +162,8 @@ void write_entry(std::string &key, std::string &value, ConfigRepresentation &con
 
     auto current_defcon = config.defcon;
 
-    auto target_string = CITADEL_DEFCON_1;
+    auto target_string = defcon_level_to_string(current_defcon);
 
-    switch (current_defcon) {
-        case Defcon::DEFCON1:
-            target_string = CITADEL_DEFCON_1;
-            break;
-        case Defcon::DEFCON2:
-            target_string = CITADEL_DEFCON_2;
-            break;
-        case Defcon::DEFCON3:
-            target_string = CITADEL_DEFCON_3;
-            break;
-        case Defcon::DEFCON4:
-            target_string = CITADEL_DEFCON_4;
-            break;
-        case Defcon::DEFCON5:
-            target_string = CITADEL_DEFCON_5;
-            break;
-    }
     bool found = false;
     bool done = false;
 
@@ -199,24 +201,7 @@ void write_entry(std::string &key, std::string &value, ConfigRepresentation &con
 
 //An invariant of this function is that there is NOT an existing signature, this is a bug if this is ever called and a signature already exists.
 void write_signature(std::string &signature, Defcon defcon, ConfigRepresentation &config) {
-    std::string decfon_string;
-    switch (defcon) {
-        case Defcon::DEFCON1:
-            decfon_string = CITADEL_DEFCON_1;
-            break;
-        case Defcon::DEFCON2:
-            decfon_string = CITADEL_DEFCON_2;
-            break;
-        case Defcon::DEFCON3:
-            decfon_string = CITADEL_DEFCON_3;
-            break;
-        case Defcon::DEFCON4:
-            decfon_string = CITADEL_DEFCON_4;
-            break;
-        case Defcon::DEFCON5:
-            decfon_string = CITADEL_DEFCON_5;
-            break;
-    }
+    std::string decfon_string = defcon_level_to_string(defcon);
 
     std::ifstream vault(config.vault_file_path);
 
@@ -369,14 +354,14 @@ std::vector<std::string> read_all_entries(ConfigRepresentation &config,
             continue;
 
         if (in_defcon == true) {
-
             std::string k = line.substr(0, line.find('='));
             std::string v = line.substr(line.find('=') + 1, line.size() - line.find('=') - 1);
 
 
             logger.log(LogLevel::DEBUG, "read_many_entries()", k);
             logger.log(LogLevel::DEBUG, "read_many_entries()", v);
-            values.push_back(line); //Should we return the line for another function to be able to print the key or just pass values back? Probably best to pass the whole line and let another function parse the lines
+            values.push_back(line);
+            //Should we return the line for another function to be able to print the key or just pass values back? Probably best to pass the whole line and let another function parse the lines
             *signature = std::move(sig);
         }
     }
@@ -707,25 +692,7 @@ void rekey_defcon_level(Defcon defcon_level, ConfigRepresentation &config,
 
     std::string line;
     bool in_defcon = false;
-    std::string current_defcon_string;
-
-    switch (defcon_level) {
-        case Defcon::DEFCON1:
-            current_defcon_string = CITADEL_DEFCON_1;
-            break;
-        case Defcon::DEFCON2:
-            current_defcon_string = CITADEL_DEFCON_2;
-            break;
-        case Defcon::DEFCON3:
-            current_defcon_string = CITADEL_DEFCON_3;
-            break;
-        case Defcon::DEFCON4:
-            current_defcon_string = CITADEL_DEFCON_4;
-            break;
-        case Defcon::DEFCON5:
-            current_defcon_string = CITADEL_DEFCON_5;
-            break;
-    }
+    std::string current_defcon_string = defcon_level_to_string(defcon_level);
 
     while (std::getline(vault, line)) {
         if (line.starts_with('#')) {
@@ -803,3 +770,19 @@ void create_vault(std::filesystem::path &vault_path) {
     vault.close();
 }
 
+void handle_value_list(std::vector<std::string> values, Encryption::EncryptionContext &encryption_context) {
+    encryption_context.receive_passphrase();
+
+    for (const auto &value: values) {
+        std::string k = value.substr(0, value.find('='));
+        std::string v = value.substr(value.find('=') + 1, value.size() - value.find('=') - 1);
+
+        encryption_context.decrypt_string(v);
+
+        std::string plaintext = std::move(encryption_context.secret);
+
+        std::cout << k << "=" << plaintext << std::endl;
+    }
+
+    exit(0);
+}

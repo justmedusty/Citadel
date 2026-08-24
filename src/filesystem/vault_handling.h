@@ -46,4 +46,9 @@ void list_all_entries(const ConfigRepresentation &config);
 void rekey_defcon_level(Defcon defcon_level, ConfigRepresentation &config,
                         Encryption::EncryptionContext decryption_encryption_context,
                         Encryption::EncryptionContext new_key_encryption_context);
+
+void handle_value_list(std::vector<std::string> values, Encryption::EncryptionContext &encryption_context);
+
+std::vector<std::string> read_all_entries(ConfigRepresentation &config,
+                                          std::string *signature);
 #endif //CITADEL_VAULT_HANDLING_H
