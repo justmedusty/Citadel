@@ -24,3 +24,15 @@ DEFCON2 -> VERY SERIOUS SECRETS, SHOULD ALSO HAVE FEW ENTRIES AND A MAXIMALLY CO
 DEFCON3 -> MID-LEVEL SERIOUS SECRETS, SHOULD HAVE A COMPLEX PASSWORD, COULD BE WRITTEN DOWN ON PAPER <br>
 DEFCON4 -> LESS-SERIOUS, ONLINE ACCOUNT PASSWORDS AND THINGS OF THIS NATURE, COULD BE WRITTEN DOWN ON PAPER <br>
 DEFCON5 -> LEAST SERIOUS, PASSWORD DOES NOT NEED TO BE VERY COMPLEX JUST ENOUGH TO KEEP LOOKY LOOS OUT, COULD BE WRITTEN DOWN ON PAPER <br>
+
+## **CAUTION**
+When ENTERING passwords to be placed into the vault, it will be placed into your history. You should always run unset HISTFILE before inserting a sensitive password into your vault, and you should be using some 
+kind of disk encryption to make it impossible to derive that secret from the file on disk if you accidentally put it in the histfile. In the case that you do accidentally get it into your histfile, a smart thing to do would be to the gnu coreutils shred command on the history file. You can do this like so in a bash shell <br>
+> shred \$(echo \$HISTFILE)
+> 
+To prevent needing to do this, before you run your 'citadel -e -k key -v secret_value -defcon 5' command, run
+
+> unset HISTFILE
+> 
+
+and close the terminal when you are done, the history file will not have been written.
