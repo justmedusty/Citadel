@@ -129,12 +129,17 @@ private:
                 << std::endl <<
                 "-vf -> precedes a path string, points to a specific location for your vault file, main reason would be if your vault file is in a non-standard location such as a mounted flash drive"
                 << std::endl <<
-                "-k -> precedes the key to the value you are trying to retrieve, insert, or delete from the vault" << std::endl <<
-                "-v -> precedes the value for a new value you are encrypting and inserting into the vault." << std::endl <<
+                "-k -> precedes the key to the value you are trying to retrieve, insert, or delete from the vault" <<
+                std::endl <<
+                "-v -> precedes the value for a new value you are encrypting and inserting into the vault." << std::endl
+                <<
                 "-h -> display the help message you are currently reading." << std::endl <<
                 "-dk -> delete a key and its associated value from the vault" << std::endl <<
-                "-defcon -> precedes an integer (1,2,3,4,5) for an ENCRYPT operation only, specifies where the new entry should go" << std::endl <<
-                    "-allkeys -> precedes an integer (1,2,3,4,5) for defcon level, will gather and decrypt every key in that defcon level in one operation"
+                "-defcon -> precedes an integer (1,2,3,4,5) for an ENCRYPT operation only, specifies where the new entry should go"
+                << std::endl <<
+                "-allkeys -> precedes an integer (1,2,3,4,5) for defcon level, will gather and decrypt every key in that defcon level in one operation"
+                << std::endl <<
+                "-keylist -> precedes an integer (1,2,3,4,5) for defcon level, decrypts all of the selected keys in that particular defcon level, similar to -allkeys just more constrained. The only valid way to use this is like such citadel -keylist 4(defcon level) key1,key2,key3,key4,key5"
                 << std::endl <<
                 "-ls -> lists all entries in your vault" << std::endl <<
                 "-loglevel -> verbosity/log level, precedes an acceptable value, acceptable values are debug, info, warn, error, critical. Default is error."

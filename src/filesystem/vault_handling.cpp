@@ -347,7 +347,8 @@ std::vector<std::string> read_all_entries(ConfigRepresentation &config,
             logger.log(LogLevel::DEBUG, "read_entry()",
                        std::format("Signature for Defcon{} is {}", static_cast<int>(defcon), *line.c_str()));
             sig = line.replace(line.find(CITADEL_VAULT_SIG_START), strlen(CITADEL_VAULT_SIG_START) - 1, "").replace(
-                line.find(CITADEL_VAULT_SIG_END), strlen(CITADEL_VAULT_SIG_END) - 1, "");
+                line.find(CITADEL_VAULT_SIG_END), strlen(CITADEL_VAULT_SIG_END), "");
+            continue;
         }
 
         if (line.starts_with('#')) // support comments
@@ -356,7 +357,6 @@ std::vector<std::string> read_all_entries(ConfigRepresentation &config,
         if (in_defcon == true) {
             std::string k = line.substr(0, line.find('='));
             std::string v = line.substr(line.find('=') + 1, line.size() - line.find('=') - 1);
-
 
             logger.log(LogLevel::DEBUG, "read_many_entries()", k);
             logger.log(LogLevel::DEBUG, "read_many_entries()", v);
@@ -438,7 +438,8 @@ std::vector<std::string> read_many_entries(std::vector<std::string> &keys, Confi
                 logger.log(LogLevel::DEBUG, "read_entry()",
                            std::format("Signature for Defcon{} is {}", static_cast<int>(defcon), *line.c_str()));
                 sig = line.replace(line.find(CITADEL_VAULT_SIG_START), strlen(CITADEL_VAULT_SIG_START) - 1, "").replace(
-                    line.find(CITADEL_VAULT_SIG_END), strlen(CITADEL_VAULT_SIG_END) - 1, "");
+                    line.find(CITADEL_VAULT_SIG_END), strlen(CITADEL_VAULT_SIG_END), "");
+                continue;
             }
 
             if (line.starts_with('#')) // support comments
