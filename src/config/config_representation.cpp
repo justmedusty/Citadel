@@ -54,6 +54,9 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
     bool delete_key = false;
     bool rekey = false;
     bool decrypt_all = false;
+    bool decrypt_many = false;
+    bool defcon_set = false;
+    std::vector<std::string> keys;
     //Set a default value if the user does not specify it will go to defcon5
     this->defcon = Defcon::DEFCON5;
     for (auto arg = arguments.begin(); arg != arguments.end(); ++arg) {
@@ -65,6 +68,30 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
             //we do not list it right away since they may pass us a different vault file via a commandline option instead of the default vault file, we do it
             //after parsing
             ls = true;
+            continue;
+        }
+
+
+        if (*arg == FLAG_DECRYPT_MANY_KEYS) {
+            decrypt_many = true;
+
+            if (arg == arguments.end()) {
+                std::cerr << "You passed " << FLAG_DECRYPT_MANY_KEYS << " without any keys, this is invalid." <<
+                        std::endl;
+                exit(1);
+            }
+
+            while (++arg != arguments.end() && *arg != FLAG_DEFCON_LEVEL_TO_ENCRYPT) {
+                logger.log(LogLevel::DEBUG, "parse_command_line_args()", "Pushing back arg...");
+                keys.push_back(*arg);
+            }
+
+            if (arg == arguments.end()) {
+                std::cerr <<
+                        "You must specifcy the defcon level for multientry decryption for correctness purposes and to prevent bugs"
+                        << std::endl;
+                exit(1);
+            }
             continue;
         }
 
@@ -118,7 +145,7 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
             /*
              *  The way we are parsing this is forgiving , 12434534 would be 1 , 23453456, would be 2 etc.
              */
-
+            defcon_set = true;
             switch (arg->data()[0]) {
                 case '1':
                     this->defcon = Defcon::DEFCON1;
@@ -191,36 +218,6 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
             }
 
             decrypt_all = true;
-
-            ++arg;
-
-            /*
-             *  The way we are parsing this is forgiving , 12434534 would be 1 , 23453456, would be 2 etc.
-             */
-
-            switch (arg->data()[0]) {
-                case '1':
-                    this->defcon = Defcon::DEFCON1;
-                    break;
-                case '2':
-                    this->defcon = Defcon::DEFCON2;
-                    break;
-                case '3':
-                    this->defcon = Defcon::DEFCON3;
-                    break;
-                case '4':
-                    this->defcon = Defcon::DEFCON4;
-                    break;
-                case '5':
-                    this->defcon = Defcon::DEFCON5;
-                    break;
-                default:
-                    std::cerr << *arg << " is an invalid defcon value, {1,2,3,4,5} are the valid values." << std::endl;
-                    /*
-                     * We may want to cleanse all of these arg values in case user passes something sensitive accidentally, but for now we won't
-                     */
-                    exit(1);
-            }
         }
     }
 
@@ -247,10 +244,28 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
         rekey_defcon_level(this->defcon, *this, decryption_context, decryption_context);
     }
 
-    if (decrypt_all == true) {
+    if (decrypt_many == true) {
+        if (defcon_set == false) {
+            std::cerr <<
+                    "When decrypting many, to prevent odd behavior, you must specify the defcon level. It is not specified."
+                    << std::endl;
+            exit(1);
+        }
+
         Encryption::EncryptionContext decryption_context(*this);
-        std::string sig;
-        auto values = read_all_entries(*this, &sig);
+        auto values = read_many_entries(keys, *this);
+        handle_value_list(values, decryption_context);
+    }
+
+    if (decrypt_all == true) {
+        if (defcon_set == false) {
+            std::cerr <<
+                    "When decrypting many, to prevent odd behavior, you must specify the defcon level. It is not specified."
+                    << std::endl;
+            exit(1);
+        }
+        Encryption::EncryptionContext decryption_context(*this);
+        auto values = read_all_entries(*this);
         handle_value_list(values, decryption_context);
     }
 

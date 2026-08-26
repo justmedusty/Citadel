@@ -33,6 +33,7 @@ enum class EncryptionMode;
 #define FLAG_REPASS_DEFCON_LEVEL "-repass"
 #define FLAG_LOG_LEVEL "-loglevel"
 #define FLAG_DECRYPT_ALL_KEYS "-allkeys"
+#define FLAG_DECRYPT_MANY_KEYS "-keylist"
 
 
 #define FILE_NO_OBFUSCATION_CONFIG_KEY "no_obfuscation"
@@ -139,7 +140,7 @@ private:
                 << std::endl <<
                 "-allkeys -> precedes an integer (1,2,3,4,5) for defcon level, will gather and decrypt every key in that defcon level in one operation"
                 << std::endl <<
-                "-keylist -> precedes an integer (1,2,3,4,5) for defcon level, decrypts all of the selected keys in that particular defcon level, similar to -allkeys just more constrained. The only valid way to use this is like such citadel -keylist 4(defcon level) key1,key2,key3,key4,key5"
+                "-keylist -> precedes a list of keys , requires the -defcon option to say which level for correctness purposes, decrypts all of the selected keys in that particular defcon level, similar to -allkeys just more constrained. The only valid way to use this is like such citadel -keylist key1 key2 key3 key4 key5 -defcon 5"
                 << std::endl <<
                 "-ls -> lists all entries in your vault" << std::endl <<
                 "-loglevel -> verbosity/log level, precedes an acceptable value, acceptable values are debug, info, warn, error, critical. Default is error."

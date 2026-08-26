@@ -257,8 +257,7 @@ void write_signature(std::string &signature, Defcon defcon, ConfigRepresentation
     std::filesystem::rename(temp_path, config.vault_file_path);
 }
 
-std::vector<std::string> read_all_entries(ConfigRepresentation &config,
-                                          std::string *signature) {
+std::vector<std::string> read_all_entries(ConfigRepresentation &config) {
     std::ifstream vault(config.vault_file_path);
 
     if (!vault.is_open()) {
@@ -358,11 +357,10 @@ std::vector<std::string> read_all_entries(ConfigRepresentation &config,
             std::string k = line.substr(0, line.find('='));
             std::string v = line.substr(line.find('=') + 1, line.size() - line.find('=') - 1);
 
-            logger.log(LogLevel::DEBUG, "read_many_entries()", k);
-            logger.log(LogLevel::DEBUG, "read_many_entries()", v);
+            logger.log(LogLevel::DEBUG, "read_all_entries()", k);
+            logger.log(LogLevel::DEBUG, "read_all_entries()", v);
             values.push_back(line);
-            //Should we return the line for another function to be able to print the key or just pass values back? Probably best to pass the whole line and let another function parse the lines
-            *signature = std::move(sig);
+            //Should we return the line for another function to be able to print the key or just pass values back? Probably best to pass the whole line and let another function parse the lines;
         }
     }
 
@@ -373,8 +371,7 @@ std::vector<std::string> read_all_entries(ConfigRepresentation &config,
  *  Finds an entry and reads it into value.
  */
 
-std::vector<std::string> read_many_entries(std::vector<std::string> &keys, ConfigRepresentation &config,
-                                           std::string *signature) {
+std::vector<std::string> read_many_entries(std::vector<std::string> &keys, ConfigRepresentation &config) {
     std::ifstream vault(config.vault_file_path);
 
     if (!vault.is_open()) {
@@ -437,8 +434,6 @@ std::vector<std::string> read_many_entries(std::vector<std::string> &keys, Confi
             if (line.starts_with(CITADEL_VAULT_SIG_START)) {
                 logger.log(LogLevel::DEBUG, "read_entry()",
                            std::format("Signature for Defcon{} is {}", static_cast<int>(defcon), *line.c_str()));
-                sig = line.replace(line.find(CITADEL_VAULT_SIG_START), strlen(CITADEL_VAULT_SIG_START) - 1, "").replace(
-                    line.find(CITADEL_VAULT_SIG_END), strlen(CITADEL_VAULT_SIG_END), "");
                 continue;
             }
 
@@ -447,15 +442,12 @@ std::vector<std::string> read_many_entries(std::vector<std::string> &keys, Confi
 
             std::string k = line.substr(0, line.find('='));
             std::string v = line.substr(line.find('=') + 1, line.size() - line.find('=') - 1);
-
-
             logger.log(LogLevel::DEBUG, "read_many_entries()", k);
             logger.log(LogLevel::DEBUG, "read_many_entries()", v);
 
             if (k == key) {
                 found = true;
-                values.push_back(v);
-                *signature = std::move(sig);
+                values.push_back(line);
             }
         }
 
@@ -771,8 +763,14 @@ void create_vault(std::filesystem::path &vault_path) {
     vault.close();
 }
 
-void handle_value_list(std::vector<std::string> values, Encryption::EncryptionContext &encryption_context) {
+void handle_value_list(const std::vector<std::string> &values, Encryption::EncryptionContext &encryption_context) {
+    if (values.empty()) {
+        std::cerr << "The value list is empty" << std::endl;
+        exit(1);
+    }
+
     encryption_context.receive_passphrase();
+
 
     for (const auto &value: values) {
         std::string k = value.substr(0, value.find('='));
