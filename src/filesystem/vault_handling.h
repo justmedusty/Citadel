@@ -6,7 +6,7 @@
 #define CITADEL_VAULT_HANDLING_H
 
 #include <filesystem>
-
+#include <set>
 #define MAXIMUM_VAULT_SIZE (1024 * 1024 * 1024) // This is arbitrary but because we are reading the entire file into memory we need a sanity check, 1MB is absolutely massive so this should never happen
 
 
@@ -38,7 +38,7 @@ std::string get_defcon_signature(std::string &vault_file_path, Defcon defcon);
 
 void create_vault(std::filesystem::path &vault_path);
 
-std::vector<std::string> read_many_entries(std::vector<std::string> &keys, ConfigRepresentation &config);
+std::set<std::string> read_many_entries(std::set<std::string> &keys, ConfigRepresentation &config);
 
 void list_all_entries(const ConfigRepresentation &config);
 
@@ -46,7 +46,7 @@ void rekey_defcon_level(Defcon defcon_level, ConfigRepresentation &config,
                         Encryption::EncryptionContext decryption_encryption_context,
                         Encryption::EncryptionContext new_key_encryption_context);
 
-void handle_value_list(const std::vector<std::string> &values, Encryption::EncryptionContext &encryption_context);
+void handle_value_list(const std::set<std::string> &values, Encryption::EncryptionContext &encryption_context);
 
-std::vector<std::string> read_all_entries(ConfigRepresentation &config);
+std::set<std::string> read_all_entries(ConfigRepresentation &config);
 #endif //CITADEL_VAULT_HANDLING_H

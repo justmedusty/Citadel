@@ -10,8 +10,7 @@
 #include <string>
 #include <algorithm>
 #include <cstring>
-#include <boost/mpl/aux_/na_fwd.hpp>
-
+#include <set>
 #include "crypt/encryption.h"
 
 std::string defcon_level_to_string(const Defcon defcon) {
@@ -257,7 +256,7 @@ void write_signature(std::string &signature, Defcon defcon, ConfigRepresentation
     std::filesystem::rename(temp_path, config.vault_file_path);
 }
 
-std::vector<std::string> read_all_entries(ConfigRepresentation &config) {
+std::set<std::string> read_all_entries(ConfigRepresentation &config) {
     std::ifstream vault(config.vault_file_path);
 
     if (!vault.is_open()) {
@@ -270,7 +269,7 @@ std::vector<std::string> read_all_entries(ConfigRepresentation &config) {
                 " is too large for Citadel to handle. Please investigate." << std::endl;
         exit(1);
     }
-    std::vector<std::string> values;
+    std::set<std::string> values;
     std::string line;
     std::string sig;
     Defcon defcon;
@@ -359,7 +358,7 @@ std::vector<std::string> read_all_entries(ConfigRepresentation &config) {
 
             logger.log(LogLevel::DEBUG, "read_all_entries()", k);
             logger.log(LogLevel::DEBUG, "read_all_entries()", v);
-            values.push_back(line);
+            values.insert(line);
             //Should we return the line for another function to be able to print the key or just pass values back? Probably best to pass the whole line and let another function parse the lines;
         }
     }
@@ -371,7 +370,7 @@ std::vector<std::string> read_all_entries(ConfigRepresentation &config) {
  *  Finds an entry and reads it into value.
  */
 
-std::vector<std::string> read_many_entries(std::vector<std::string> &keys, ConfigRepresentation &config) {
+std::set<std::string> read_many_entries(std::set<std::string> &keys, ConfigRepresentation &config) {
     std::ifstream vault(config.vault_file_path);
 
     if (!vault.is_open()) {
@@ -384,77 +383,86 @@ std::vector<std::string> read_many_entries(std::vector<std::string> &keys, Confi
                 " is too large for Citadel to handle. Please investigate." << std::endl;
         exit(1);
     }
-    std::vector<std::string> values;
+    std::set<std::string> values;
     std::string line;
     std::string sig;
     Defcon defcon;
     //found is used so that we dont jump to another defcon when weve grabbed keys from a different one. Read many is ONLY for entries in the same defcon level.
     bool found = false;
 
-    for (const auto &key: keys) {
-        while (std::getline(vault, line)) {
-            if (line == CITADEL_DEFCON_1) {
-                if (found == true) {
-                    return std::move(values);
-                }
-                defcon = Defcon::DEFCON1;
-                continue;
+    while (std::getline(vault, line)) {
+        if (line == CITADEL_DEFCON_1) {
+            if (found == true) {
+                return std::move(values);
             }
-
-            if (line == CITADEL_DEFCON_2) {
-                if (found == true) {
-                    return std::move(values);
-                }
-                defcon = Defcon::DEFCON2;
-                continue;
-            }
-
-            if (line == CITADEL_DEFCON_3) {
-                if (found == true) {
-                    return std::move(values);
-                }
-                defcon = Defcon::DEFCON3;
-                continue;
-            }
-            if (line == CITADEL_DEFCON_4) {
-                if (found == true) {
-                    return std::move(values);
-                }
-                defcon = Defcon::DEFCON4;
-                continue;
-            }
-            if (line == CITADEL_DEFCON_5) {
-                if (found == true) {
-                    return std::move(values);
-                }
-                defcon = Defcon::DEFCON5;
-                continue;
-            }
-
-            if (line.starts_with(CITADEL_VAULT_SIG_START)) {
-                logger.log(LogLevel::DEBUG, "read_entry()",
-                           std::format("Signature for Defcon{} is {}", static_cast<int>(defcon), *line.c_str()));
-                continue;
-            }
-
-            if (line.starts_with('#')) // support comments
-                continue;
-
-            std::string k = line.substr(0, line.find('='));
-            std::string v = line.substr(line.find('=') + 1, line.size() - line.find('=') - 1);
-            logger.log(LogLevel::DEBUG, "read_many_entries()", k);
-            logger.log(LogLevel::DEBUG, "read_many_entries()", v);
-
-            if (k == key) {
-                found = true;
-                values.push_back(line);
-            }
+            defcon = Defcon::DEFCON1;
+            continue;
         }
 
-        if (found == true) {
-            return std::move(values);
+        if (line == CITADEL_DEFCON_2) {
+            if (found == true) {
+                return std::move(values);
+            }
+            defcon = Defcon::DEFCON2;
+            continue;
+        }
+
+        if (line == CITADEL_DEFCON_3) {
+            if (found == true) {
+                return std::move(values);
+            }
+            defcon = Defcon::DEFCON3;
+            continue;
+        }
+        if (line == CITADEL_DEFCON_4) {
+            if (found == true) {
+                return std::move(values);
+            }
+            defcon = Defcon::DEFCON4;
+            continue;
+        }
+        if (line == CITADEL_DEFCON_5) {
+            if (found == true) {
+                return std::move(values);
+            }
+            defcon = Defcon::DEFCON5;
+            continue;
+        }
+
+        if (line.starts_with(CITADEL_VAULT_SIG_START)) {
+            logger.log(LogLevel::DEBUG, "read_entry()",
+                       std::format("Signature for Defcon{} is {}", static_cast<int>(defcon), *line.c_str()));
+            continue;
+        }
+
+        if (line.starts_with('#')) // support comments
+            continue;
+
+        std::string k = line.substr(0, line.find('='));
+        std::string v = line.substr(line.find('=') + 1, line.size() - line.find('=') - 1);
+        logger.log(LogLevel::DEBUG, "read_many_entries()", k);
+        logger.log(LogLevel::DEBUG, "read_many_entries()", v);
+
+        if (keys.contains(k) == true) {
+
+            if (defcon != config.defcon) {
+                logger.log(LogLevel::DEBUG, "read_many_entries()",
+                           "Bad defcon level passed, does not match the config");
+                std::cerr << "The defcon level matched does not match the defcon level that " << k <<
+                        " was found in. Exiting." << std::endl;
+                exit(1);
+            }
+
+            found = true;
+            values.insert(line);
         }
     }
+
+    if (found == true) {
+        return std::move(values);
+    }
+
+    std::cerr << "No keys were found." << std::endl;
 
     exit(1);
 }
@@ -763,7 +771,7 @@ void create_vault(std::filesystem::path &vault_path) {
     vault.close();
 }
 
-void handle_value_list(const std::vector<std::string> &values, Encryption::EncryptionContext &encryption_context) {
+void handle_value_list(const std::set<std::string> &values, Encryption::EncryptionContext &encryption_context) {
     if (values.empty()) {
         std::cerr << "The value list is empty" << std::endl;
         exit(1);

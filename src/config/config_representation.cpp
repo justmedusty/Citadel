@@ -56,10 +56,12 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
     bool decrypt_all = false;
     bool decrypt_many = false;
     bool defcon_set = false;
-    std::vector<std::string> keys;
+    std::set<std::string> keys;
     //Set a default value if the user does not specify it will go to defcon5
     this->defcon = Defcon::DEFCON5;
+
     for (auto arg = arguments.begin(); arg != arguments.end(); ++arg) {
+
         if (*arg == FLAG_HELP) {
             help();
         }
@@ -70,7 +72,6 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
             ls = true;
             continue;
         }
-
 
         if (*arg == FLAG_DECRYPT_MANY_KEYS) {
             decrypt_many = true;
@@ -83,16 +84,15 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
 
             while (++arg != arguments.end() && *arg != FLAG_DEFCON_LEVEL_TO_ENCRYPT) {
                 logger.log(LogLevel::DEBUG, "parse_command_line_args()", "Pushing back arg...");
-                keys.push_back(*arg);
+                keys.insert(*arg);
             }
 
             if (arg == arguments.end()) {
                 std::cerr <<
-                        "You must specifcy the defcon level for multientry decryption for correctness purposes and to prevent bugs"
+                        "You must specify the defcon level for multientry decryption for correctness purposes and to prevent bugs"
                         << std::endl;
                 exit(1);
             }
-            continue;
         }
 
         if (*arg == FLAG_DELETE_KEY) {
