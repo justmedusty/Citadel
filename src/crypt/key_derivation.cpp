@@ -12,7 +12,7 @@
 #include "config/config_representation.h"
 
 //Platform agnostic get system memory, we are just doing this to ensure we arent going to absolutely shit their whole system down the
-//drain with our tinfoil hate argon2 parameters. 
+//drain with our tinfoil hate argon2 parameters.
 uint64_t get_system_memory() {
 #if defined(_WIN32)
     MEMORYSTATUSEX s;
@@ -71,10 +71,16 @@ int derive_key(
     uint64_t systemMemory = get_system_memory() / (1024 * 1024);
 
 
-    uint64_t argon2MB = systemMemory / 4;
+    uint64_t argon2MB = 2048;
 
-    argon2MB = std::max(argon2MB, static_cast<uint64_t>(1024)); // floor: 1 GB
-    argon2MB = std::min(argon2MB, static_cast<uint64_t>(12288)); // ceil:  12 GB
+    if(systemMemory < argon2MB){
+        std::cout << "The amount of memory on your system (" << systemMemory << ") is not enough for the citadel memory requirements. If you must use this system, you should recompile and manually change argon2MB in key_derivation.cpp to be much lower and be aware that with this custom compiled binary you cannot use a different value for any secrets you encrpypt with it." << std::endl;
+        exit(1);
+    }
+
+    if((systemMemory - argon2MB) < (systemMemory / 2)){
+        std::cout << "Your system memory will be very strained by the argon2 memory parameters, it should be able to pull it off, but be aware that there could be contention here.";
+    }
 
     logger.log(LogLevel::DEBUG, "derive_key()",
                std::format("Amount of system memory available: {}MB , amount after checking min and max {}MB",
@@ -113,6 +119,7 @@ int derive_key(
     uint32_t iterations = ARGON2_ROUNDS_BASE + defcon_boost;
     logger.log(LogLevel::DEBUG, "derive_key()",
                std::format("Your argon2 memory cost is {} and your iterations count is {}", m_cost, iterations));
+
     uint32_t parallelism = std::thread::hardware_concurrency(); // num lanes will be the number of cores on the system
 
     logger.log(LogLevel::DEBUG, "derive_key()",

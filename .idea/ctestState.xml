@@ -2,6 +2,10 @@
 <project version="4">
   <component name="CidrCTestProjectState">
     <ctestState>
+      <lineNumber testId="path:CMakeLists.txt test:CitadelEncryptionTests" value="67" />
+      <lineNumber testId="path:CMakeLists.txt test:CitadelKeyDerivationTests" value="68" />
+      <lineNumber testId="path:CMakeLists.txt test:CitadelParseTests" value="66" />
+      <lineNumber testId="path:CMakeLists.txt test:CitadelVaultOperationsTests" value="69" />
       <lineNumber testId="path:CMakeLists.txt test:LibreVaultEncryptionTests" value="56" />
       <lineNumber testId="path:CMakeLists.txt test:LibreVaultKeyDerivationTests" value="57" />
       <lineNumber testId="path:CMakeLists.txt test:LibreVaultParseTests" value="55" />
