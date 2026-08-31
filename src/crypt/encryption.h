@@ -40,6 +40,8 @@ namespace Encryption {
 
         std::string encrypt_string();
 
+        void receive_value(const std::string &key);
+
         bool verify_defcon_signature(std::optional<std::string> signature);
 
         explicit EncryptionContext(const ConfigRepresentation &config) {
@@ -47,10 +49,13 @@ namespace Encryption {
             this->configRepresentation = config;
             this->passphrase = "";
             this->confirm_passphrase = "";
+            this->secret = "";
             this->key_material = std::vector<std::byte>(32);
             this->iv = std::vector<std::byte>(AES_GCM_IV_LEN);
             this->mode = EncryptionMode::AES_256_GCM; //Default algo
-            this->secret = config.value;
+            if (config.decrypt == false && config.key.empty() == false) {
+                receive_value(config.key);
+            }
             this->defcon_signature = "";
         }
 

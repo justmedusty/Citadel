@@ -74,7 +74,7 @@ int derive_key(
     uint64_t argon2MB = 2048;
 
     if(systemMemory < argon2MB){
-        std::cout << "The amount of memory on your system (" << systemMemory << ") is not enough for the citadel memory requirements. If you must use this system, you should recompile and manually change argon2MB in key_derivation.cpp to be much lower and be aware that with this custom compiled binary you cannot use a different value for any secrets you encrpypt with it." << std::endl;
+        std::cout << "The amount of memory on your system (" << systemMemory << ") is not enough for the citadel memory requirements. If you must use this system, you should recompile and manually change argon2MB in key_derivation.cpp to be much lower and be aware that with this custom compiled binary you cannot use a different value for any secrets you encrypt with it." << std::endl;
         exit(1);
     }
 

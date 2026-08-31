@@ -224,7 +224,7 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
 
     if (!this->vault_file_path.empty() && !std::filesystem::exists(this->vault_file_path)) {
         std::cout << "No vault file exists at location : " << this->vault_file_path << " , creating a new vault..." <<
-                std::endl;
+                std::endl;   void receive_passphrase();
         create_vault(this->vault_file_path);
     }
 

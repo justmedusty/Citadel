@@ -316,6 +316,25 @@ namespace Encryption {
         return Base64::base64_encode(final_payload);
     }
 
+    void EncryptionContext::receive_value(const std::string &key) {
+        if (!stdin_terminal()) {
+            return;
+            // This is for testing purposes for now but may be good from preventing the wrong use of this application
+        }
+        set_stdin_echo(false);
+        std::string current_DEFCON;
+
+        std::cout << "Please enter the value for the key " << key <<
+                " the DEFCON level password you must provide is DEFCON" << static_cast<
+                    int>(this->current_defcon) <<
+                std::endl;
+
+        std::cin >> secret;
+
+
+        set_stdin_echo(true);
+        std::cout << std::endl;
+    }
 
     void EncryptionContext::receive_passphrase() {
         if (!stdin_terminal()) {
