@@ -16,8 +16,9 @@ int main(int argc, char **argv) {
     logger.log(LogLevel::DEBUG, "main()", "attempting to lock memory...");
 
     Encryption::lock_memory();
-    Encryption::EncryptionContext encryption_context(*config);
     auto ret = is_vault_setup(config->vault_file_path);
+
+    Encryption::EncryptionContext encryption_context(*config);
 
     if (config->decrypt == false && !(ret & (1 << (static_cast<int>(config->defcon) - 1)))) {
         std::string sig = encryption_context.generate_signature();
@@ -40,7 +41,7 @@ int main(int argc, char **argv) {
             exit(1);
         }
 
-        encryption_context.secret = std::move(config->value);
+        encryption_context.receive_value(encryption_context.configRepresentation.key);
         auto encrypted_secret = encryption_context.encrypt_string();
         write_entry(config->key, encrypted_secret, *config);
     }

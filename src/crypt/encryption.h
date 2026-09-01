@@ -53,9 +53,6 @@ namespace Encryption {
             this->key_material = std::vector<std::byte>(32);
             this->iv = std::vector<std::byte>(AES_GCM_IV_LEN);
             this->mode = EncryptionMode::AES_256_GCM; //Default algo
-            if (config.decrypt == false && config.key.empty() == false) {
-                receive_value(config.key);
-            }
             this->defcon_signature = "";
         }
 

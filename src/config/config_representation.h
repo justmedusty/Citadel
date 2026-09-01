@@ -105,13 +105,10 @@ struct ConfigRepresentation {
     }
 
 
-    ~ConfigRepresentation() {
-        OPENSSL_cleanse(value.data(), value.size());
-    }
+    ~ConfigRepresentation() = default;
 
     bool decrypt;
     std::string key;
-    std::string value;
     EncryptionMode encryption_mode;
     std::filesystem::path vault_file_path;
     Defcon defcon;
@@ -131,8 +128,7 @@ private:
                 "-vf -> precedes a path string, points to a specific location for your vault file, main reason would be if your vault file is in a non-standard location such as a mounted flash drive"
                 << std::endl <<
                 "-k -> precedes the key to the value you are trying to retrieve, insert, or delete from the vault" <<
-                std::endl <<
-                "-v -> precedes the value for a new value you are encrypting and inserting into the vault." << std::endl
+                std::endl
                 <<
                 "-h -> display the help message you are currently reading." << std::endl <<
                 "-dk -> delete a key and its associated value from the vault" << std::endl <<

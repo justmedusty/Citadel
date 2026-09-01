@@ -324,9 +324,7 @@ namespace Encryption {
         set_stdin_echo(false);
         std::string current_DEFCON;
 
-        std::cout << "Please enter the value for the key " << key <<
-                " the DEFCON level password you must provide is DEFCON" << static_cast<
-                    int>(this->current_defcon) <<
+        std::cout << "Please enter the secret value for the key " << key <<
                 std::endl;
 
         std::cin >> secret;

@@ -61,7 +61,6 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
     this->defcon = Defcon::DEFCON5;
 
     for (auto arg = arguments.begin(); arg != arguments.end(); ++arg) {
-
         if (*arg == FLAG_HELP) {
             help();
         }
@@ -138,7 +137,7 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
             if (arg == arguments.end()) {
                 std::cerr <<
                         "You have passed a flag that requires a value, with no value given! You must provide a value when using the "
-                        << FLAG_VALUE << " flag." << std::endl;
+                        << FLAG_DEFCON_LEVEL_TO_ENCRYPT << "and" << FLAG_REPASS_DEFCON_LEVEL << "flag." << std::endl;
             }
             ++arg;
 
@@ -169,17 +168,6 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
                      */
                     exit(1);
             }
-            continue;
-        }
-
-        if (*arg == FLAG_VALUE) {
-            if (arg == arguments.end()) {
-                std::cerr <<
-                        "You have passed a flag that requires a value, with no value given! You must provide a value when using the "
-                        << FLAG_VALUE << " flag." << std::endl;
-            }
-            this->value = std::move(*(arg + 1));
-            ++arg;
             continue;
         }
 
@@ -224,7 +212,8 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
 
     if (!this->vault_file_path.empty() && !std::filesystem::exists(this->vault_file_path)) {
         std::cout << "No vault file exists at location : " << this->vault_file_path << " , creating a new vault..." <<
-                std::endl;   void receive_passphrase();
+                std::endl;
+        void receive_passphrase();
         create_vault(this->vault_file_path);
     }
 
@@ -278,17 +267,5 @@ void ConfigRepresentation::parse_command_line_args(std::vector<std::string> argu
         delete_entry(key, *this);
     }
 
-
-    if (this->decrypt == false && this->value.empty()) {
-        if (!this->value.empty()) {
-            //cleanse that shit
-            OPENSSL_cleanse(this->value.data(), this->value.size());
-        }
-        std::cerr <<
-                "You have not specified a value and are trying to encrypt! You must provide a value! Try citadel -h for help!"
-                <<
-                std::endl;
-        exit(1);
-    }
 }
 

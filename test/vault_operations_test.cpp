@@ -17,8 +17,6 @@ BOOST_AUTO_TEST_CASE(arg_parsing_check_with_vault_creation) {
         FLAG_ENCRYPT,
         FLAG_KEY,
         "my_secret",
-        FLAG_VALUE,
-        "test_secret123",
         FLAG_DEFCON_LEVEL_TO_ENCRYPT,
         "1",
     };
@@ -28,7 +26,6 @@ BOOST_AUTO_TEST_CASE(arg_parsing_check_with_vault_creation) {
 
     BOOST_CHECK_EQUAL(config_representation.vault_file_path, "/tmp/vault");
     BOOST_CHECK_EQUAL(config_representation.decrypt, false);
-    BOOST_CHECK_EQUAL(config_representation.value, "test_secret123");
     BOOST_CHECK_EQUAL(config_representation.key, "my_secret");
 
     std::filesystem::remove(vault_file_path);
@@ -51,7 +48,6 @@ BOOST_AUTO_TEST_CASE(arg_parsing_check2_with_vault_creation) {
     BOOST_CHECK_EQUAL(config_representation.vault_file_path, "/tmp/vault");
     BOOST_CHECK_EQUAL(config_representation.decrypt, true);
     BOOST_CHECK_EQUAL(config_representation.key, "this_secret");
-    BOOST_CHECK(config_representation.value.empty());
 
     std::filesystem::remove(vault_file_path);
 }
@@ -70,8 +66,6 @@ BOOST_AUTO_TEST_CASE(testing_top_level_encrypt_function) {
         FLAG_ENCRYPT,
         FLAG_KEY,
         "my_secret",
-        FLAG_VALUE,
-        "test_secret123",
         FLAG_DEFCON_LEVEL_TO_ENCRYPT,
         "5",
     };
@@ -79,6 +73,7 @@ BOOST_AUTO_TEST_CASE(testing_top_level_encrypt_function) {
     config_representation.parse_command_line_args(args);
     Encryption::EncryptionContext encryption_context(config_representation);
     encryption_context.passphrase = "supersecretpassword123!";
+    encryption_context.secret = "test_secret123";
     std::string base64_ciphertext = encryption_context.encrypt_string();
     std::string base64_ciphertext2 = encryption_context.encrypt_string();
 
@@ -101,8 +96,6 @@ BOOST_AUTO_TEST_CASE(testing_top_level_decrypt_function) {
         FLAG_ENCRYPT,
         FLAG_KEY,
         "my_secret",
-        FLAG_VALUE,
-        "test_secret123",
         FLAG_DEFCON_LEVEL_TO_ENCRYPT,
         "5",
     };
@@ -129,8 +122,6 @@ BOOST_AUTO_TEST_CASE(testing_top_level_decrypt_many_function) {
         FLAG_ENCRYPT,
         FLAG_KEY,
         "my_secret",
-        FLAG_VALUE,
-        "test_secret123",
         FLAG_DEFCON_LEVEL_TO_ENCRYPT,
         "5",
     };
@@ -174,8 +165,6 @@ BOOST_AUTO_TEST_CASE(write_signature_test) {
         FLAG_ENCRYPT,
         FLAG_KEY,
         "my_secret",
-        FLAG_VALUE,
-        "test_secret123",
         FLAG_DEFCON_LEVEL_TO_ENCRYPT,
         "5",
     };
@@ -209,8 +198,6 @@ BOOST_AUTO_TEST_CASE(write_vault_test) {
         FLAG_ENCRYPT,
         FLAG_KEY,
         "my_secret",
-        FLAG_VALUE,
-        "test_secret123",
         FLAG_DEFCON_LEVEL_TO_ENCRYPT,
         "5",
     };
@@ -225,7 +212,7 @@ BOOST_AUTO_TEST_CASE(write_vault_test) {
     std::string sig = encryption_context.generate_signature();
     std::cout << sig << std::endl;
     write_signature(sig, encryption_context.current_defcon, config_representation);
-    encryption_context.secret = std::move(config_representation.value);
+    encryption_context.secret = "test_secret123";
 
     std::string encrypted_entry = encryption_context.encrypt_string();
     // encrypt the "test_secret123" string so we can insert it into the vault
@@ -277,8 +264,6 @@ BOOST_AUTO_TEST_CASE(write_vault_test_many) {
         FLAG_ENCRYPT,
         FLAG_KEY,
         "my_secret",
-        FLAG_VALUE,
-        "test_secret123",
         FLAG_DEFCON_LEVEL_TO_ENCRYPT,
         "5",
     };
@@ -293,7 +278,7 @@ BOOST_AUTO_TEST_CASE(write_vault_test_many) {
     std::string sig = encryption_context.generate_signature();
     std::cout << sig << std::endl;
     write_signature(sig, encryption_context.current_defcon, config_representation);
-    encryption_context.secret = std::move(config_representation.value);
+    encryption_context.secret = "test_secret123";
 
     std::string encrypted_entry = encryption_context.encrypt_string();
     // encrypt the "test_secret123" string so we can insert it into the vault
@@ -345,8 +330,6 @@ BOOST_AUTO_TEST_CASE(write_vault_test_different_levels) {
         FLAG_ENCRYPT,
         FLAG_KEY,
         "my_secret",
-        FLAG_VALUE,
-        "test_secret123",
         FLAG_DEFCON_LEVEL_TO_ENCRYPT,
         "5",
     };
@@ -361,7 +344,7 @@ BOOST_AUTO_TEST_CASE(write_vault_test_different_levels) {
     std::string sig = encryption_context.generate_signature();
     std::cout << sig << std::endl;
     write_signature(sig, encryption_context.current_defcon, config_representation);
-    encryption_context.secret = std::move(config_representation.value);
+    encryption_context.secret = "test_secret123";
 
     std::string encrypted_entry = encryption_context.encrypt_string();
     // encrypt the "test_secret123" string so we can insert it into the vault
@@ -401,6 +384,7 @@ BOOST_AUTO_TEST_CASE(write_vault_test_different_levels) {
 
     std::filesystem::remove(vault_file_path);
 }
+
 /* This test is too destructive for use on a machine that you use this software on so it goes into the dungeon for now
 BOOST_AUTO_TEST_CASE(check_home_directory) {
     ConfigRepresentation config_representation{};
