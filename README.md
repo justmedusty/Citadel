@@ -14,6 +14,8 @@ It is intended to be used with the following flags :  <br>
 -ls -> lists all entries in your vault. <br>
 -loglevel -> verbosity/log level, precedes an acceptable value, acceptable values are debug, info, warn, error, critical. Default is error. <br>
 -repass -> precedes a DEFCON option, 1 for defcon 1 and so on. Changes the password for that entire section of the vault. You must verify the current password first. <br>
+-allkeys -> precedes an integer (1,2,3,4,5) for defcon level, will gather and decrypt every key in that defcon level in one operation <br>
+-keylist -> precedes a list of keys , requires the -defcon option to say which level for correctness purposes, decrypts all of the selected keys in that particular defcon level, similar to -allkeys just more constrained. The only valid way to use this is like such citadel -keylist key1 key2 key3 key4 key5 -defcon 5 <br>
 <br>
 <br>
 The argon2 parameters are cranked up or down depending on the defcon level, so be aware defcon1 secrets take a while to encrypt and decrypt. It truly is meant for the most sensitive secrets, otherwise lower levels will be quicker while still retaining an acceptable security profile. <br>
@@ -25,3 +27,40 @@ DEFCON4 -> LESS-SERIOUS, ONLINE ACCOUNT PASSWORDS AND THINGS OF THIS NATURE, COU
 DEFCON5 -> LEAST SERIOUS, PASSWORD DOES NOT NEED TO BE VERY COMPLEX JUST ENOUGH TO KEEP LOOKY LOOS OUT, COULD BE WRITTEN DOWN ON PAPER <br>
 
 Values are taken the same way as passwords are, so there will be no bash history concerns.
+
+
+## Basic Usage Examples
+
+### Create New Entry
+citadel -e -k my_github_password -defcon 3
+
+citadel -e -k my_lemmy_password -defcon 3
+
+citadel -e -k codeberg_password -defcon 2
+
+### Decrypt An Entry
+citadel -d -k my_github_entry
+
+citadel -d -k my_lemmy_password
+
+### Decrypt Many Entries
+citadel -keylist my_github_password my_lemmy_password -defcon 3
+
+### Decrypt All Entries In Vault Level
+citadel -allkeys -defcon 3
+
+
+### Delete A Key And Subsequent Value
+citadel -dk -k my_github_password
+
+### Change Vault Section Password
+citadel -repass 3 
+
+### List All Vault Keys And Their DEFCON Level
+citadel -ls
+
+### Using Log Levels
+citadel -loglevel debug -d -k my_lemmy_password
+
+### Seeing The Help Menu
+citadel -h
