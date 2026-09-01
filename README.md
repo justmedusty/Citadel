@@ -64,3 +64,7 @@ citadel -loglevel debug -d -k my_lemmy_password
 
 ### Seeing The Help Menu
 citadel -h
+
+## Base Machine Requirements
+As it is written, citadel requires a minimum of 8GB of memory to run it safely and 4 CPU cores. If you do not meet these requirements, you will need to modify the Argon2 parameters in key_derivation.cpp under the crypt directory.
+Be aware, if you modify the params, you can only use your custom binary to decrypt any secrets you store with it.

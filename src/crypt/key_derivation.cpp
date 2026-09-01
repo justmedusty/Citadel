@@ -71,7 +71,7 @@ int derive_key(
     uint64_t systemMemory = get_system_memory() / (1024 * 1024);
 
 
-    uint64_t argon2MB = 2048;
+    uint64_t argon2MB = 1024 * 6;
 
     if(systemMemory < argon2MB){
         std::cout << "The amount of memory on your system (" << systemMemory << ") is not enough for the citadel memory requirements. If you must use this system, you should recompile and manually change argon2MB in key_derivation.cpp to be much lower and be aware that with this custom compiled binary you cannot use a different value for any secrets you encrypt with it." << std::endl;
@@ -102,25 +102,25 @@ int derive_key(
             break;
         case Defcon::DEFCON3:
             defcon_boost = 6;
-            memory_divisor = 4;
+            memory_divisor = 2;
             break;
         case Defcon::DEFCON4:
             defcon_boost = 3;
-            memory_divisor = 6;
+            memory_divisor = 2;
             break;
         case Defcon::DEFCON5:
             defcon_boost = 1; //Only +1 rounds boost, still high, but much much lower than DEFCON1
-            memory_divisor = 12;
+            memory_divisor = 3;
             //Memory divided by 12, absolute max of 1GB on a machine with a lot of memory, minimum of 85MB.
             break;
     }
-    uint32_t m_cost = static_cast<uint32_t>((argon2MB * 1024) / memory_divisor); // Argon2 takes KB for the m_cost param
+    uint32_t m_cost = static_cast<uint32_t>((argon2MB * 1024) / memory_divisor);
 
     uint32_t iterations = ARGON2_ROUNDS_BASE + defcon_boost;
     logger.log(LogLevel::DEBUG, "derive_key()",
                std::format("Your argon2 memory cost is {} and your iterations count is {}", m_cost, iterations));
 
-    uint32_t parallelism = std::thread::hardware_concurrency(); // num lanes will be the number of cores on the system
+    uint32_t parallelism = 4; // num lanes will be the number of cores on the system
 
     logger.log(LogLevel::DEBUG, "derive_key()",
                std::format("Reported cpucount is {}", parallelism));
