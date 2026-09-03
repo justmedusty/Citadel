@@ -103,6 +103,7 @@ BOOST_AUTO_TEST_CASE(testing_top_level_decrypt_function) {
     config_representation.parse_command_line_args(args);
     Encryption::EncryptionContext encryption_context(config_representation);
     encryption_context.passphrase = "supersecretpassword123!";
+    encryption_context.secret = "test_secret123";
     std::string base64_ciphertext = encryption_context.encrypt_string();
     std::cout << base64_ciphertext << std::endl;
     std::cout << "after enc" << std::endl;
@@ -129,6 +130,7 @@ BOOST_AUTO_TEST_CASE(testing_top_level_decrypt_many_function) {
     config_representation.parse_command_line_args(args);
     Encryption::EncryptionContext encryption_context(config_representation);
     encryption_context.passphrase = "supersecretpassword123!";
+    encryption_context.secret = "test_secret123";
 
     /*
      * These all have their own tags and IV and KDF salts so we must be able to decrypt them all back to our inital test_secret string
@@ -208,6 +210,7 @@ BOOST_AUTO_TEST_CASE(write_vault_test) {
 
     encryption_context.passphrase = "supersecretpassword123!";
     encryption_context.confirm_passphrase = "supersecretpassword123!";
+    encryption_context.secret = "test_secret123";
 
     std::string sig = encryption_context.generate_signature();
     std::cout << sig << std::endl;
