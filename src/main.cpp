@@ -20,9 +20,12 @@ int main(int argc, char **argv) {
 
     Encryption::EncryptionContext encryption_context(*config);
 
+    bool fresh_password = false;
+
     if (config->decrypt == false && !(ret & (1 << (static_cast<int>(config->defcon) - 1)))) {
         std::string sig = encryption_context.generate_signature();
         write_signature(sig, encryption_context.current_defcon, *config);
+        fresh_password = true;
     }
 
 
@@ -35,7 +38,9 @@ int main(int argc, char **argv) {
         encryption_context.decrypt_string(entry);
         std::cout << encryption_context.secret << std::endl;
     } else {
-        encryption_context.receive_passphrase();
+        if (fresh_password == false) {
+            encryption_context.receive_passphrase();
+        }
 
         if (!encryption_context.verify_defcon_signature({})) {
             exit(1);

@@ -329,7 +329,6 @@ namespace Encryption {
 
         std::cin >> secret;
 
-
         set_stdin_echo(true);
         std::cout << std::endl;
     }
