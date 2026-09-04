@@ -331,6 +331,7 @@ namespace Encryption {
 
         set_stdin_echo(true);
         std::cout << std::endl;
+        std::cout.flush();
     }
 
     void EncryptionContext::receive_passphrase() {
@@ -349,6 +350,7 @@ namespace Encryption {
 
         set_stdin_echo(true);
         std::cout << std::endl;
+        std::cout.flush();
     }
 
 
@@ -369,5 +371,6 @@ namespace Encryption {
 
         set_stdin_echo(true);
         std::cout << std::endl;
+        std::cout.flush();
     }
 };
